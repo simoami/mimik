@@ -52,7 +52,7 @@ Reporter.prototype.process = function(stats, target, callback) {
         function(err, dir){
             if(err) {
                 console.log('Could not generate html reports');
-                console.err(err);
+                console.error(err);
                 logger.info('[html reporter] Could not generate html reports');                
             } else {
                 logger.profile('[html reporter] feature list page (index.html) generated.');
@@ -71,7 +71,7 @@ Reporter.prototype.createDirectory = function(target, cb) {
         if (err) {
             logger.error('[html reporter] could not prepare path', dir);
             console.log('Could not prepare path %s for write', dir);
-            console.err(err);
+            console.error(err);
             cb(err, dir);
             return;
         }
@@ -79,7 +79,7 @@ Reporter.prototype.createDirectory = function(target, cb) {
             if (err) {
                 logger.error('[html reporter] Can\'t create directory ', dir);
                 console.log('Could not create directory', dir);
-                console.err(err);
+                console.error(err);
             }
             cb(err, dir);
         });
@@ -92,7 +92,7 @@ Reporter.prototype.copyBase = function(dir, cb) {
         if(err) {
             logger.error('[html reporter] Failed copying ' + src + ' into ' + dir);
             console.log('Failed copying ' + src + ' into ' + dir);
-            console.err(err);
+            console.error(err);
         }
         cb(err, dir);
     });
@@ -110,7 +110,7 @@ Reporter.prototype.linkScreenshots = function(dir, cb) {
         if(err) {
             logger.error('[html reporter] Failed processing screenshots');
             console.log('Failed processing screenshots');
-            console.err(err);
+            console.error(err);
         }
         cb(err, dir);
     });
@@ -220,7 +220,7 @@ Reporter.prototype.writeTemplate = function(path, tpl, cb) {
         if(err) {
             logger.error('[html reporter] Failed writing file ' + path );
             console.log('Failed writing file ' + path);
-            console.err(err);
+            console.error(err);
         }
         cb();
     });

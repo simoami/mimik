@@ -45,7 +45,7 @@ Reporter.prototype.createDirectory = function(target, cb) {
         if (err) {
             logger.error('[junit reporter] could not clean path', dir);
             console.log('Could not prepare path %s for write', dir);
-            console.err(err);
+            console.error(err);
             //process.exit(1);
             return;
         }
@@ -53,7 +53,7 @@ Reporter.prototype.createDirectory = function(target, cb) {
             if (err) {
                 logger.error('[junit reporter] Can\'t create directory ', dir);
                 console.log('Could not create directory', dir);
-                console.err(err);
+                console.error(err);
                 //process.exit(1);
                 return;
             }
