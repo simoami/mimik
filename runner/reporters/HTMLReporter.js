@@ -66,7 +66,7 @@ Reporter.prototype.process = function(stats, target, callback) {
 };
 
 Reporter.prototype.createDirectory = function(target, cb) {
-    var dir = path.join(process.cwd(), target, 'reports/html');
+    var dir = path.resolve(process.cwd(), target, 'reports/html');
     fsTools.remove(dir, function(err) {
         if (err) {
             logger.error('[html reporter] could not prepare path', dir);
