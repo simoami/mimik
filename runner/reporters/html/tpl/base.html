@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>{{=it.title}} - Mimik</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="css/normalize.min.css">
+        <link rel="stylesheet" href="css/grid.css">
+        <link rel="stylesheet" href="js/vendor/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" href="js/vendor/magnific-popup/magnific-popup.css">
+        <link rel="stylesheet" href="js/vendor/pretty-photo/css/prettyPhoto.css">
+        <link rel="stylesheet" href="css/main.css">
+        <link href='http://fonts.googleapis.com/css?family=Roboto:300,400|Roboto+Slab:300,400' rel='stylesheet' type='text/css'>
+        <script src="js/vendor/modernizr-2.6.2.min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <div class="header-container">
+            <header class="header-primary">
+                <div class="logo">MIMIK</div>
+                <span class="main-menu-button" title="Click to expand"><i class="fa fa-bars"></i> REPORTS</span>
+            </header>
+        </div>
+        <div class="sidebar-container">
+            <div class="sidebar">
+                <a href="#" class="close-menu" title="Close"><i class="fa fa-times-circle fa-fw"></i></a>
+                <div class="sidebar-msg">Select a report</div>
+                <div class="sidebar-content clearfix">
+                    <div class="sidebar-nav">
+                        <ul>
+                            <li class="test-summary"><i class="fa fa-dashboard"></i> <a href="index.html">Test Results</a></li>
+                            <li class="test-analytics"><i class="fa fa-bar-chart-o"></i> <a href="test_analytics.html">Test Analytics</a></li>
+                            <li class="test-tag-statistics"><i class="fa fa-dashboard"></i> <a href="tag_usage.html">Tag Usage</a></li>
+                            <li class="test-configuration"><i class="fa fa-gear"></i> <a href="parameters.html">Test Parameters</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <header class="report-header">
+            <h1 class="report-title">{{?it.back}}<a href="{{=it.back}}"><span class="fa fa-angle-left"></span> Back</a> | {{?}}{{=it.title}}</h1>
+        </header>
+        <div class="main-container">
+            {{#def.body}}
+        </div> <!-- #main-container -->
+
+        <script src="js/vendor/jquery-1.11.0.min.js"></script>
+        <script src="js/vendor/d3/d3.min.js"></script>
+        <script src="js/vendor/magnific-popup/jquery.magnific-popup.min.js"></script>
+        <script src="js/vendor/pretty-photo/js/jquery.prettyPhoto.js"></script>
+        
+        <script src="js/main.js"></script>
+    </body>
+</html>

@@ -1,0 +1,112 @@
+<div class="report-feature">
+    <div class="report-feature-title">Feature: {{!it.feature.title}}</div>
+    <div class="report-feature-subtitle"><span class="fa fa-hdd-o"></span> {{=it.feature.feature.file}}</div>
+    <div class="hr"></div>
+    <div class="report-summary">
+        <div class="globalstatus two-fifths">
+            <div class="globalstatus-symbol {{=it.feature.stats.failures > 0 ? 'color-failed' : 'color-passed'}}">
+              <svg width="45" height="45">
+                <circle cx="25" cy="25" r="18" stroke-width="4" fill="none"></circle>
+              </svg><span class="fa {{=it.feature.stats.failures > 0 ? 'fa-exclamation' : 'fa-check'}} fa-lg">
+              </span>
+            </div>
+            <div class="globalstatus-text">{{=it.feature.stats.failures > 0 ? 'FAILED' : 'PASSED'}}</div>
+        </div>
+        <div class="globalmeta-alt fifth primary-row"><div class="label">Scenarios</div><div class="value small">{{=it.feature.stats.scenarios.total}}</div></div>
+        <div class="globalmeta-alt fifth primary-row"><div class="label">Steps</div><div class="value small">{{=it.feature.stats.tests}}</div></div>
+        <div class="globalmeta-alt fifth primary-row"><div class="label">Duration</div><div class="value small">{{=it.fn.duration(it.feature.stats.duration)}}</div></div>
+        <div class="globalmeta-alt fifth color-passed"><div class="label">Passed</div><div class="value">{{=it.feature.stats.passes}}</div></div>
+        <div class="globalmeta-alt fifth color-skipped"><div class="label">Skipped</div><div class="value">{{=it.feature.stats.pending}}</div></div>
+        <div class="globalmeta-alt fifth color-failed"><div class="label">Failed</div><div class="value">{{=it.feature.stats.failures}}</div></div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="hr"></div>
+    
+    <div class="report-section"><span>Scenarios</span></div>
+    {{~it.feature.scenarios :scenario:scenarioIndex}}
+    <div class="scenario-link code"><span class="fa fa-angle-down"></span> <a href="#scenario_{{=scenarioIndex+1}}">{{!scenario.title}}</a></div>
+    {{~}}
+    
+    <div class="report-section"><span>Results</span></div>
+
+    <table>
+        <thead>
+            <tr>
+                <td class="report-feature-header-cell"></td>
+                <td class="report-feature-header-cell"></td>
+                <td class="report-feature-header-cell report-feature-header-step-duration"><span class="fa fa-clock-o" title="Duration"></span></td>
+            </tr>
+        </thead>
+        <tbody>
+            {{~it.feature.annotations :annotation}}
+            <tr>
+                <td class="no-border"></td>
+                <td class="code report-feature-code-cell disabled" colspan="2"><div class="code-feature code-annotation">{{!annotation.txt}}</div></td>
+            </tr>
+            {{~}}
+            <tr>
+                <td class="badge"></td>
+                <td class="code report-feature-code-cell"><div class="code-feature"><em>Feature:</em> {{!it.feature.title}}</div></td>
+                <td></td>
+            </tr>
+            {{? it.feature.feature.description.length > 0}}
+            <tr>
+                <td class="no-border"></td>
+                <td class="code report-feature-code-cell" colspan="2"><div class="code-feature-description">
+                    {{~it.feature.feature.description :description:index}}
+                        <div>{{!description}}</div>
+                    {{~}}
+                </div></td>
+            </tr>
+            {{?}}
+            {{~it.feature.scenarios :scenario:scenarioIndex}}
+                {{~scenario.annotations :annotation}}
+            <tr>
+                <td class="no-border"></td>
+                <td class="code report-feature-code-cell disabled" colspan="2"><div class="code-scenario code-annotation">{{!annotation.txt}}</div></td>
+            </tr>
+                {{~}}
+            <tr>
+                <td class="badge"><a class="scenario-anchor" name="scenario_{{=scenarioIndex+1}}"></td>
+                <td class="code report-feature-code-cell {{=scenario.suite.pending?'disabled': ''}}"><div class="code-scenario"><em>Scenario:</em> {{!scenario.title}}</div></td>
+                <td>{{?!scenario.suite.pending}}{{=it.fn.duration(scenario.stats.duration)}}{{??}}-{{?}}</td>
+            </tr>
+                {{~scenario.steps :step:stepIndex}}
+            <tr>
+                <td class="badge no-border">
+                    {{?step.pending}}
+                    <span class="fa fa-lg fa-dot-circle-o color-skipped" title="Skipped"></span>
+                    {{?? !step.success}}
+                    <span class="fa fa-lg fa-exclamation-circle color-failed" title="Failed"></span>
+                    {{??}}
+                    <span class="fa fa-lg fa-check-circle-o color-passed" title="Passed"></span>
+                    {{?}}
+                </td>
+                <td class="code report-feature-code-cell {{=scenario.suite.pending?'disabled': ''}}">
+                    <div class="code-step">{{!step.title}}
+                    {{?!step.success && !step.pending}}
+                        <div class="code-error">
+                            <div class="code-error-message">
+                                {{?step.test.screenshotFile}}
+                                <a class="code-error-screenshot" href="{{=step.test.screenshotFile}}" rel="screenshot" title="<span class='fa fa-exclamation-circle fa-lg color-failed'></span> {{!step.title}}<div class='color-failed'>{{!step.failure.toString()}}</div>"><span class="fa fa-camera"></span></a>
+                                {{?}}
+                                <span class="code-collapsible-stack-icon fa fa-chevron-circle-right"></span> 
+                                <a href="#">{{!step.failure.toString()}}</a>
+                            </div>
+                            <div class="code-error-stack">{{!step.failure.stack}}</div>
+                        </div>
+                    {{?}}
+                    
+                    </div>
+                </td>
+                <td>{{?!step.pending}}{{=it.fn.duration(step.duration)}}{{??}}-{{?}}</td>
+            </tr>
+                    
+                {{~}}
+            {{~}}
+        </tbody>
+    </table>
+    </div>
+
+    <div class="hr"></div>
+</div>

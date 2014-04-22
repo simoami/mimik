@@ -1,0 +1,79 @@
+<div class="report-feature report-tags">
+<div class="report-section"><span>Summary</span></div>
+<table class="report-table">
+    <thead>
+        <tr>
+            <td class="report-feature-header-cell" colspan="2">Tag</td>
+            <td class="report-feature-header-cell">Features</td>
+            <td class="report-feature-header-cell">Scenarios</td>
+            <td class="report-feature-header-cell">Steps</td>
+            <td class="report-feature-header-cell">Passed</td>
+            <td class="report-feature-header-cell">Skipped</td>
+            <td class="report-feature-header-cell">Failed</td>
+            <td class="report-feature-header-cell report-feature-header-step-duration"><span class="fa fa-clock-o" title="Duration"></span></td>
+        </tr>
+    </thead>
+    <tbody>
+        {{~it.tagStats :tag:index}}
+        <tr class="{{=index % 2 ? 'alt' : '' }}"> 
+            <td class="badge no-border">
+                {{?tag.stats.failures}}
+                <span class="fa fa-lg fa-exclamation-circle color-failed" title="Failed"></span>
+                {{??}}
+                <span class="fa fa-lg fa-check-circle-o color-passed" title="Passed"></span>
+                {{?}}
+            </td>
+            <td class="text-left code"><a class="tag" href="#tag_{{=index+1}}">{{!tag.annotation.txt}}</a></td>
+            <td>{{=tag.stats.features}}</td>
+            <td>{{=tag.stats.scenarios}}</td>
+            <td>{{=tag.stats.steps}}</td>
+            <td>{{=tag.stats.passes}}</td>
+            <td>{{=tag.stats.pending}}</td>
+            <td>{{=tag.stats.failures}}</td>
+            <td>{{=it.fn.duration(tag.stats.duration)}}</td>
+        </tr>
+        {{~}}
+    </tbody>
+</table>
+
+<div class="report-section"><span>Details</span></div>
+    {{~it.tagStats :tag:index}}
+    <a class="scenario-anchor" name="tag_{{=index+1}}"></a>
+    <div class="report-section-subtitle"><span class="fa fa-angle-down"></span> Features with tag <span class="tag">{{!tag.annotation.txt}}</span></div>
+    <table class="report-table">
+        <thead>
+            <tr>
+                <td class="report-feature-header-cell" colspan="2"></td>
+                <td class="report-feature-header-cell">Scenarios</td>
+                <td class="report-feature-header-cell">Steps</td>
+                <td class="report-feature-header-cell">Passed</td>
+                <td class="report-feature-header-cell">Skipped</td>
+                <td class="report-feature-header-cell">Failed</td>
+                <td class="report-feature-header-cell report-feature-header-step-duration"><span class="fa fa-clock-o" title="Duration"></span></td>
+            </tr>
+        </thead>
+        <tbody>
+        {{~tag.features :feature:featureIndex}}
+            <tr class="{{=featureIndex % 2 ? 'alt' : '' }}"> 
+                <td class="badge no-border">
+{{?feature.stats.failures}}
+<span class="fa fa-lg fa-exclamation-circle color-failed" title="Failed"></span>
+{{??}}
+<span class="fa fa-lg fa-check-circle-o color-passed" title="Passed"></span>
+{{?}}
+</td>
+                <td class="text-left stretch"><a href="{{!feature.htmlFile}}">{{!feature.title}}</a></td>
+                <td>{{=feature.stats.scenarios.total}}</td>
+                <td>{{=feature.stats.tests}}</td>
+                <td>{{=feature.stats.passes}}</td>
+                <td>{{=feature.stats.pending}}</td>
+                <td>{{=feature.stats.failures}}</td>
+                <td>{{=it.fn.duration(feature.stats.duration) }}</td>
+            </tr>
+        {{~}}
+        </tbody>
+    </table>
+    <br/>
+    {{~}}
+    <div class="hr"></div>
+</div>

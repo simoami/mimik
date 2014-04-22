@@ -1,0 +1,57 @@
+<div class="report-section"><span>Configuration</span></div>
+<table class="report-table">
+    <thead>
+        <tr class="report-table-header report-table-header-secondary">
+            <td>Parameter</td>
+            <td>Value</td>
+         </tr> 
+    </thead>
+    <tbody>
+        {{~it.options :row:index}}
+            {{? !it.fn.utils.isEmpty(row.value) }}
+        <tr class="{{=index % 2 ? 'alt' : '' }}"> 
+            <td class="text-left no-wrap code">{{=row.key}}</td>
+            <td class="stretch text-left code">{{=row.value}}</td>
+        </tr>
+            {{?}}
+        {{~}}
+    </tbody>
+</table>
+<div class="report-section"><span>Feature Files</span></div>
+<table class="report-table">
+    <tbody>
+        {{~it.featureFiles :file:index}}
+        <tr class="{{=index % 2 ? 'alt' : '' }}"> 
+            <td class="text-left code">{{=index+1}}</td>
+            <td class="stretch text-left code">{{!file}}</td>
+        </tr>
+        {{~}}
+    </tbody>
+</table>
+
+<div class="report-section"><span>Step Files</span></div>
+<table class="report-table">
+    <tbody>
+        {{~it.stepFiles :file:index}}
+        <tr class="{{=index % 2 ? 'alt' : '' }}"> 
+            <td class="text-left code">{{=index+1}}</td>
+            <td class="stretch text-left code">{{!file}}</td>
+            <td>{{=it.fn.fileType(file)}}</td>
+        </tr>
+        {{~}}
+    </tbody>
+</table>
+
+<div class="report-section"><span>Other Source Files</span></div>
+<table class="report-table">
+    <tbody>
+        {{~it.sourceFiles :file:index}}
+        <tr class="{{=index % 2 ? 'alt' : '' }}"> 
+            <td class="text-left code">{{=index+1}}</td>
+            <td class="stretch text-left code">{{!file}}</td>
+            <td>{{=it.fn.fileType(file)}}</td>
+        </tr>
+        {{~}}
+    </tbody>
+</table>
+<div class="hr"></div>

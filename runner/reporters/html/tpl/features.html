@@ -1,0 +1,88 @@
+        <div class="report-feature">
+            <div class="report-summary">
+                <div class="third">
+                    <div class="globalstatus">
+                        <div class="globalstatus-symbol {{=it.stats.failures > 0 ? 'color-failed' : 'color-passed'}}">
+                          <svg width="45" height="45">
+                            <circle cx="25" cy="25" r="18" stroke-width="4" fill="none"></circle>
+                          </svg><span class="fa {{=it.stats.failures > 0 ? 'fa-exclamation' : 'fa-check'}} fa-lg">
+                          </span>
+                        </div>
+                        <div class="globalstatus-text">{{=it.stats.failures > 0 ? 'FAILED' : 'PASSED'}}</div>
+                    </div>
+                </div>
+                <div class="two-thirds">
+                    <div class="globalresults">
+                        <div class="big-total {{=it.stats.passes > 0 ? 'total-passed' : 'total-neutral'}}"><div>{{=it.stats.passes}}</div>Passed</div>
+                        <div class="big-total {{=it.stats.pending > 0 ? 'total-skipped' : 'total-neutral'}}"><div>{{=it.stats.pending}}</div>Skipped</div>
+                        <div class="big-total {{=it.stats.failures > 0 ? 'total-failed' : 'total-neutral'}}"><div>{{=it.stats.failures}}</div>Failed</div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="hr"></div>
+            <div class="report-summary">
+                <div class="third text-center">
+                    <div class="globalmeta-alt">
+                        <div class="label">Duration</div><div class="value small">{{=it.fn.duration(it.stats.duration)}}</div>
+                    </div>
+                </div>
+                <div class="third text-center">
+                    <div class="globalmeta-alt">
+                        <div class="label">Execution time</div><div class="value small">{{=it.fn.date(it.stats.start).format('llll')}}</div>
+                    </div>
+                </div>
+                <div class="third text-center">
+                    <div class="globalmeta-alt">
+                        <div class="label">Browser Configurations</div><div class="value small">{{=it.profiles.length}}</div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            
+            </div>
+            <div class="report-section"><span>Results</span></div>
+            <table class="report-table">
+                <thead>
+                    <tr class="report-table-header border-bottom">
+                        <td rowspan="2"  colspan="2" class="no-bottom-border">Feature</td>
+                        <td colspan="4">Scenarios</td>
+                        <td colspan="4">Steps</td>
+                        <td rowspan="2" class="no-bottom-border"><span class="fa fa-clock-o" title="Duration"></span></td>
+                    </tr>
+                    <tr class="report-table-header report-table-header-secondary">
+                        <td>Total</td>
+                        <td>Passed</td>
+                        <td>Skipped</td>
+                        <td>Failed</td>
+                        <td>Total</td>
+                        <td>Passed</td>
+                        <td>Skipped</td>
+                        <td>Failed</td>
+                     </tr> 
+                </thead>
+                <tbody>
+                    {{~it.stats.results :row:index}}
+                    <tr class="{{=index % 2 ? 'alt' : '' }}"> 
+                        <td class="badge">
+                            <span class="fa-stack {{=row.stats.failures > 0 ? 'color-failed' : 'color-passed'}}">
+                               <i class="fa fa-circle-o fa-stack-2x"></i>
+                               <i class="fa {{=row.stats.failures > 0 ? 'fa-exclamation' : 'fa-check'}} fa-stack-1x"></i>
+                            </span>
+                        </td>
+                        <td class="stretch text-left no-wrap"><a href="{{=row.htmlFile}}">{{!row.title}}</a></td>
+                        <td>{{=row.stats.scenarios.total}}</td>
+                        <td>{{=row.stats.scenarios.passes}}</td>
+                        <td>{{=row.stats.scenarios.pending}}</td>
+                        <td>{{=row.stats.scenarios.failures}}</td>
+                        <td>{{=row.stats.tests}}</td>
+                        <td>{{=row.stats.passes}}</td>
+                        <td>{{=row.stats.pending}}</td>
+                        <td>{{=row.stats.failures}}</td>
+                        <td>{{=it.fn.duration(row.stats.duration)}}</td>
+                    </tr>
+                    {{~}}
+                </tbody>
+            </table>
+
+            <div class="hr"></div>
+        </div>

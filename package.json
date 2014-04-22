@@ -1,0 +1,98 @@
+{
+  "name": "uiautomator",
+  "version": "0.0.1",
+  "description": "UI Automation made easy!",
+  "private": true,
+  "main": "./bin/cli",
+  "scripts": {
+    "start": "node app/index.js",
+    "pretest": "jshint --node --sloppy index.js lib/*.js lib/jute/*.js",
+    "test": "mocha --recursive --reporter spec test/*",
+    "coverage": "istanbul cover _mocha --recursive test/*"
+  },
+  "bin": {
+    "uiauto": "./bin/cli"
+  },
+  "engines": {
+    "node": ">=0.10"
+  },
+  "keywords": [
+    "ui",
+    "automation",
+    "automated",
+    "test",
+    "tests",
+    "functional",
+    "integration",
+    "testing",
+    "browser",
+    "BDD",
+    "spec",
+    "DSL",
+    "gherkin",
+    "GWT",
+    "given",
+    "when",
+    "then",
+    "feature",
+    "scenario",
+    "grammar",
+    "html",
+    "dom",
+    "javascript",
+    "gui",
+    "coffee",
+    "coffeescript",
+    "user",
+    "interactive",
+    "interaction",
+    "click",
+    "mouse",
+    "keyboard"
+  ],
+  "author": "Simo Moujami <simo@webinventinc.com>",
+  "contributors": [
+    "Simo Moujami <simo@webinventinc.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/simoami/uiautomator.git"
+  },
+  "dependencies": {
+    "socket.io": "~0.9.16",
+    "express": "~3.4.8",
+    "open": "0.0.4",
+    "http-route-proxy": "~0.1.1",
+    "dynamic-reverse-proxy": "~0.4.5",
+    "browser-logger": "~1.0.0",
+    "express-dot": "~0.1.0",
+    "http-proxy": "~1.0.2",
+    "assert": "~1.1.1",
+    "follow-redirects": "0.0.3",
+    "connect": "~2.13.0",
+    "colors": "~0.6.2",
+    "commander": "~2.1.0",
+    "glob": "~3.2.9",
+    "yadda": "~0.10.5",
+    "selenium-webdriver": "~2.40.0",
+    "coffee-script": "~1.7.1",
+    "async": "~0.2.10",
+    "cli-table": "~0.3.0",
+    "mocha": "~1.18.2",
+    "winston": "~0.7.3",
+    "didyoumean": "~1.2.0",
+    "webdriverjs": "~1.5.1",
+    "dot": "~1.0.2",
+    "chai": "~1.9.1",
+    "fs-tools": "~0.2.11",
+    "moment": "~2.6.0"
+  },
+  "devDependencies": {
+    "istanbul": "*",
+    "jshint": "*",
+    "should": "*",
+    "superagent": "*",
+    "express-debug": "~1.0.3"
+  },
+  "license": "MIT"
+}
