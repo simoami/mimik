@@ -39,7 +39,7 @@ Reporter.prototype.process = function(stats, targetPath, callback) {
 };
 
 Reporter.prototype.createDirectory = function(target, cb) {
-    var dir = path.join(process.cwd(), target, 'reports/junit');
+    var dir = path.resolve(process.cwd(), target, 'reports/junit');
     var tools = require('fs-tools');
     tools.remove(dir, function(err) {
         if (err) {
