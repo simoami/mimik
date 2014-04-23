@@ -172,9 +172,9 @@ function getLogger(config) {
 
     // share logger config
     winston.addColors(colors);
-    winston.loggers.add('uiautomator', options);
+    winston.loggers.add('mimik', options);
 
-    var logger = winston.loggers.get('uiautomator');
+    var logger = winston.loggers.get('mimik');
     logger.setLevels(levels);
 
     if (config.debug) {
@@ -200,7 +200,7 @@ function runTests(targets) {
     var files = getTestFiles(targets, utils.copyTo({}, program, 'match,matchInvert,tags,excludeTags,rerun'));
     logger.debug('[command] matching files', files);
 
-    utils.apply(utils.copyTo(config, program, 'browsers,timeout,slow,debug,bail,tunnel,port,parallel,parallelStrategy,reporters,reportPath,rerun,shareSession,match,matchInvert,tags,excludeTags,rerun'), {
+    utils.apply(utils.copyTo(config, program, 'browsers,timeout,slow,debug,bail,tunnel,port,testStrategy,reporters,reportPath,rerun,shareSession,match,matchInvert,tags,excludeTags,rerun'), {
         featureFiles: files.featureFiles,
         stepFiles: files.stepFiles,
         sourceFiles: files.sourceFiles

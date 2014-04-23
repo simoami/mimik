@@ -1,6 +1,6 @@
 /*jshint node:true*/
 var webdriverjs = require('webdriverjs'),
-    logger = require('winston').loggers.get('uiautomator');
+    logger = require('winston').loggers.get('mimik');
 
 function Driver(runner) {
     var me = this;

@@ -3,13 +3,11 @@ var async = require('async'),
     path = require('path'),
     utils = require('../lib/utils'),
     EventEmitter = require('events').EventEmitter,
-    logger = require('winston').loggers.get('uiautomator'),
+    logger = require('winston').loggers.get('mimik'),
     stepFileProcessor = require('./StepFileProcessor'),
     Mocha = require('mocha'),
     Yadda = require('yadda'),
     English = Yadda.localisation.English,
-    dictionary = new Yadda.Dictionary().define('NUM', /(\d+)/),
-    library = English.library(dictionary),
     chai = require('chai');
 
 
@@ -33,6 +31,7 @@ Session.prototype.start = function(cb) {
     me.executeFeature(function(err) {
         if(err) {
             logger.error('[session] An error has occurred during execution', err);
+            console.error('[session]  An error has occurred during execution', err);
         }
         logger.debug('[session] Done processing file ', me.featureFile);
         if(typeof cb === 'function') {
@@ -84,6 +83,8 @@ Session.prototype.executeFeature = function(callback) {
                 var stepFile = me.getStepFile(me.featureFile);
                 //var libraries = me.getFeatureRequires(feature);
                 stepFileProcessor.processFile(stepFile, function(file) {
+                    var dictionary = new Yadda.Dictionary().define('NUM', /(\d+)/),
+                        library = English.library(dictionary);
                     file.execute(library, chai, me.driver, stepFileProcessor);
                     var yadda = new Yadda.Yadda(library);
 

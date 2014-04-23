@@ -5,7 +5,7 @@ var fs = require('fs'),
     utils = require('../../lib/utils'),
     fsTools = require('fs-tools'),
     moment = require('moment'),
-    logger = require('winston').loggers.get('uiautomator'),
+    logger = require('winston').loggers.get('mimik'),
     dot = require('dot');
 
 function Reporter(runner, options) {

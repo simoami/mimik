@@ -1,5 +1,5 @@
 {
-  "name": "uiautomator",
+  "name": "mimik",
   "version": "0.0.1",
   "description": "UI Automation made easy!",
   "private": true,
@@ -11,7 +11,7 @@
     "coverage": "istanbul cover _mocha --recursive test/*"
   },
   "bin": {
-    "uiauto": "./bin/cli"
+    "mimik": "./bin/cli"
   },
   "engines": {
     "node": ">=0.10"
@@ -56,7 +56,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/simoami/uiautomator.git"
+    "url": "git://github.com/simoami/mimik.git"
   },
   "dependencies": {
     "socket.io": "~0.9.16",

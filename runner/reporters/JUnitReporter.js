@@ -2,7 +2,7 @@
 var fs = require('fs'),
     path = require('path'),
     utils = require('../../lib/utils'),
-    logger = require('winston').loggers.get('uiautomator'),
+    logger = require('winston').loggers.get('mimik'),
     dot = require('dot');
 
 function Reporter(runner, options) {

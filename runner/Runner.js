@@ -7,7 +7,7 @@
 var async = require('async'),
     utils = require('../lib/utils'),
     EventEmitter = require('events').EventEmitter,
-    logger = require('winston').loggers.get('uiautomator'),
+    logger = require('winston').loggers.get('mimik'),
     reporters = require('./reporters'),
     drivers = require('./drivers'),
     BQ = require('./BrowserQueue'),
@@ -20,94 +20,102 @@ function Runner(options) {
     me.reporters = {};
     me.drivers = {};
     me.sessions = {};
-    me.browserProfiles = []
-    // TODO make browserConfig dynamic
-    
-    utils.each(me.options.browsers||['firefox'], function(profile) {
-        if(utils.isString(profile)) {
-            profile = {
-                desiredCapabilities: {
-                    browserName: profile
-                },
-                driver: 'webdriver'
-            };
-        }
-        me.browserProfiles.push(profile);
-    });
+    // process browser profiles
+    me.processBrowserProfiles(me.options.browsers);
     EventEmitter.call(me, options);
-
 }
 // Make Runner an Observable
 utils.extend(Runner, EventEmitter);
 
-
-Runner.prototype.run = function(cb) {
+Runner.prototype.run = function (cb) {
     var me = this;
-    var worker = function (featureFile, callback) {
-        var profile = bq.next();
-        var driver = new drivers[profile.driver](me, me.options);
-        driver.init(profile);
-        driver.start(function(sessionId) {
-            var session = new Session({
-                driver: driver,
-                featureFile: featureFile,
-                profile: profile,
-                id: sessionId,
-                options: me.options
-            });
-            me.sessions[sessionId] = session;
-            me.setupListeners(session);
-            session.start(function(err, session) {
-                driver.stop(function() {
-                    logger.debug('[runner] Closed Client Session Id', session.id);
-                    if(typeof callback === 'function') {
-                        bq.release(session.profile);
-                        callback(null, session.id);
-                    }
-                });
-            });
-        });
-    };
-    
-    var concurrency = me.browserProfiles.length;
-    var bq = new BQ(me.browserProfiles);
+    if(me.options.testStrategy === 'browser') {
+        me.runBrowserStrategy(cb);
+    } else {
+        // default mode
+        me.runTestStrategy(cb);
+    }
+}
+Runner.prototype.runBrowserStrategy = function(cb) {
+    var me = this;
     //me.preProcessDrivers();
     me.preProcessReporters();
     me.emit('start');
-    var q = async.queue(worker, concurrency);
-    q.drain = function() {
-        logger.debug('Done processing all files');
-        me.emit('end');
-        me.postProcessReporters(function() {
-            if(typeof cb === 'function') {
-                cb(me.stats);
-            }
+    var tasks = [];
+    utils.each(me.browserProfiles, function(profile) {
+        // prepare  tasks for a single profile
+        tasks.push(function(callback) {
+            // run features under current profile
+            async.eachSeries(
+                me.options.featureFiles, 
+                function(featureFile, callback) {
+                    console.log('running', featureFile, 'in', profile.desiredCapabilities.browserName);
+                    me.runFeatureFile(featureFile, profile, callback);
+                },
+                callback
+            );
         });
+    });
+    // run tasks in parallel across multiple browser profiles
+    async.parallel(tasks, function() {
+        me.postRun(cb);
+    });
+};
+
+Runner.prototype.runTestStrategy = function(cb) {
+    var me = this;
+    //me.preProcessDrivers();
+    me.preProcessReporters();
+    me.emit('start');
+    me.bq = new BQ(me.browserProfiles);
+    var concurrency = me.browserProfiles.length;
+    var q = async.queue(function(featureFile, callback) {
+        var profile = me.bq.next();
+        me.runFeatureFile(featureFile, profile, function(err, session) {
+            me.bq.release(session.profile);
+            callback(err, session.id);
+        });
+    }, concurrency);
+    q.drain = function() {
+        me.postRun(cb);
     };
     q.push(me.options.featureFiles);
-    /*
+};
+Runner.prototype.runFeatureFile = function (featureFile, profile, callback) {
+    var me = this;
+    var driver = new drivers[profile.driver](me, me.options);
+    driver.init(profile);
     driver.start(function(sessionId) {
-        me.emit('start', sessionId);
-        // execute features after the browser is launched
-        async.mapSeries(me.options.featureFiles, function(file, cb) {
-            me.executeFeature(file, driver, cb);
-        }, 
-        function(err, results) {
-            me.emit('end', results);
-            me.drivers.webdriver.stop(function() {
-                me.postProcessReporters(function() {
-                    if(typeof cb === 'function') {
-                        cb(me.stats);
-                    }
-                });
-
+        var session = new Session({
+            driver: driver,
+            featureFile: featureFile,
+            profile: profile,
+            id: sessionId,
+            options: me.options
+        });
+        me.sessions[sessionId] = session;
+        me.setupListeners(session);
+        session.start(function(err, session) {
+            driver.stop(function() {
+                logger.debug('[runner] Closed Client Session Id', session.id);
+                if(typeof callback === 'function') {
+                    //console.log('CLOSING SESSION', session.id, profile.desiredCapabilities.browserName);
+                    callback(null, session);
+                }
             });
         });
     });
-    */
-
 };
-
+Runner.prototype.postRun = function(cb) {
+    var me = this;
+    logger.debug('[runner] Done processing all files');
+    me.emit('end');
+    me.postProcessReporters(function() {
+        if(typeof cb === 'function') {
+            cb(me.stats);
+        }
+    });
+};
 Runner.prototype.preProcessReporters = function() {
     var me = this,
         Reporter,
@@ -169,6 +177,22 @@ Runner.prototype.setupListeners = function(source) {
     source.on('pass', function(test) { me.emit('pass', test); });
     source.on('fail', function(test, err) { me.emit('fail', test, err); });
     source.on('pending', function(test) { me.emit('pending', test); });
+};
+Runner.prototype.processBrowserProfiles = function (profiles) {
+    var me = this;
+    me.browserProfiles = [];
+    // default to firefox and webdriver
+    utils.each(profiles||['firefox'], function(profile) {
+        if(utils.isString(profile)) {
+            profile = {
+                desiredCapabilities: {
+                    browserName: profile
+                },
+                driver: 'webdriver'
+            };
+        }
+        me.browserProfiles.push(profile);
+    });
 };
 
 /**
