@@ -8,13 +8,13 @@ var fs = require('fs'),
     logger = require('winston').loggers.get('mimik'),
     dot = require('dot');
 
-function Reporter(runner, options) {
+function Reporter(runner) {
     var me = this;
     if (!runner) {
         return;
     }
     me.runner = runner;
-    me.options = options;
+    me.options = runner.options;
     me.screenshots = [];
     runner.on('fail', function(test) {
        me.getScreenshot(test);
@@ -122,11 +122,10 @@ Reporter.prototype.createFeatureListPage = function(dir, stats, cb) {
     var tpl = dot.template(baseTpl, null, {
         body: featuresTpl
     });
-    var options = me.runner.options;
     var output = tpl({
         title: 'Test Results',
         stats: stats,
-        profiles: me.getProfiles(options.browsers),
+        profiles: me.getProfiles(me.runner.browserProfiles),
         fn: {
             duration: me.getDuration,
             date: moment

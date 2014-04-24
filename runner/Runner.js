@@ -49,7 +49,7 @@ Runner.prototype.runBrowserStrategy = function(cb) {
             async.eachSeries(
                 me.options.featureFiles, 
                 function(featureFile, callback) {
-                    console.log('running', featureFile, 'in', profile.desiredCapabilities.browserName);
+                    //console.log('running', featureFile, 'in', profile.desiredCapabilities.browserName);
                     me.runFeatureFile(featureFile, profile, callback);
                 },
                 callback
@@ -119,17 +119,17 @@ Runner.prototype.postRun = function(cb) {
 Runner.prototype.preProcessReporters = function() {
     var me = this,
         Reporter,
-        reps = [].concat(me.options.reporters||[]),
-        baseIndex = reps.indexOf('base');
-    // insert of move the base reporter to the beginning of the list to ensure it runs first
-    if(baseIndex > -1) {
-        reps.splice(baseIndex, 1);
-    }
-    reps.unshift('base');
-    utils.each(reps, function(key) {
-        Reporter = reporters[key];
+        reps = [{ name: 'base'}];
+    utils.each(me.options.reporters||[], function(reporter) {
+        reporter = utils.isObject(reporter) ? reporter : { name: reporter };
+        if(reporter.name !== 'base') {
+            reps.push(reporter);
+        }
+    })
+    utils.each(reps, function(rep) {
+        Reporter = reporters[rep.name];
         if(Reporter) {
-            me.reporters[key] = new Reporter(me, me.options);
+            me.reporters[rep.name] = new Reporter(me, rep);
         }
     });
 };

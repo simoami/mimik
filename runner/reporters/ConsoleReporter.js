@@ -4,7 +4,7 @@ var Table = require('cli-table'),
     utils = require('../../lib/utils'),
     tty = require('tty');
 
-function Reporter(runner, options) {
+function Reporter(runner, config) {
     var me = this,
         stats = this.stats = {
             features: 0,
@@ -29,11 +29,11 @@ function Reporter(runner, options) {
         return;
     }
     me.runner = runner;
-    me.options = options;
+    me.options = runner.options;
 
     runner.stats = stats;
 
-    runner.on('start', function(sessionId) {
+    runner.on('start', function() {
         var total = me.options.featureFiles.length;
         stats.start = new Date();
         console.log();
@@ -45,58 +45,18 @@ function Reporter(runner, options) {
         console.log();
     }.bind(me));
 
-    // feature = {
-    //     bdd: feature,
-    //     scenarios: feature.scenarios,
-    //     stats: stats,
-    //     obj: suite
-    // }
-    // scenario = {
-    //     bdd: feature.scenarios[x],
-    //     steps: scenario.steps,
-    //     stats: stats,
-    //     obj: feature.obj.suites[x]
-    // }
-    // step = {
-    //     bdd: scenario.steps[x],
-    //     stats: stats,
-    //     obj: scenario.obj.tests[x]
-    // }
-
-    runner.on('feature', function(feature) {
-        stats.features++;
-        me.feature = {
-            title: feature.title,
-            feature: data.feature,
-            annotations: getAnnotations(feature.annotations),
-            scenarios: [],
-            stats: {
-                tests: 0,
-                start: new Date(),
-                scenarios: {
-                    total: 0,
-                    passes: 0,
-                    pending: 0,
-                    failures: 0
-                },
-                end: null,
-                duration: 0,
-                passes: 0,
-                pending: 0,
-                failures: 0,
-                slow: 0,
-                medium: 0,
-                fast: 0
-            },
-            suite: feature.suite
-        };
+    runner.on('feature', function(data) {
         // Run the feature tests
-        var len = ("Feature " + feature.file).length;
+        var len = ("Feature " + data.feature.file).length;
+        utils.each(data.feature.scenarios, function(scenario) {
+            console.log(scenario);
+        });
         console.log(getSeparator(len).grey);
-        console.log("Feature %s", feature.file.grey);
+        console.log("Feature %s", data.feature.file.grey);
+        console.log("Profile %s", data.profile.desiredCapabilities.file.grey);
     });
     
-    runner.on('suite', function(suite) {
+    runner.on('xsuite', function(suite) {
         if(suite !== me.feature.suite && !suite.root) {
             // Add scenario
             stats.scenarios.total++;
@@ -124,7 +84,7 @@ function Reporter(runner, options) {
         }
     });
 
-    runner.on('suite end', function(suite) {
+    runner.on('xsuite end', function(suite) {
         if(suite !== me.feature.suite && !suite.root) {
             // update current scenario
             var end = new Date(),
@@ -145,7 +105,7 @@ function Reporter(runner, options) {
         }
     });
     
-    runner.on('test', function(test) {
+    runner.on('xtest', function(test) {
         test.start = new Date();
         test.feature = me.feature;
     });
@@ -156,11 +116,11 @@ function Reporter(runner, options) {
     // runner.on('pending', function() {
     // });
     
-    runner.on('fail', function(test, err) {
+    runner.on('xfail', function(test, err) {
        failures.push(err);
     });
 
-    runner.on('test end', function(test) {
+    runner.on('xtest end', function(test) {
         var end = new Date(),
             scenario = me.feature.scenarios[me.feature.scenarios.length-1];
         var step = buildStep(test),
@@ -197,7 +157,7 @@ function Reporter(runner, options) {
         scenario.steps.push(step);
     });
 
-    runner.on('feature end', function() {
+    runner.on('xfeature end', function() {
         var end = new Date();
         // Update feature stats
         me.feature.stats.end = end;
@@ -205,7 +165,7 @@ function Reporter(runner, options) {
         stats.results.push(me.feature);
     });
 
-    runner.on('end', function() {
+    runner.on('xend', function() {
         stats.end = new Date();
         stats.duration = stats.end - stats.start;
     });

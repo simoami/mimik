@@ -4,7 +4,7 @@ function execute(library, chai, driver, fileProcessor) {
     var origRequire = require;
     require = function(file) {
         var name = path.basename(file);
-        if(/Steps?|-steps?/.test(name)) {
+        if(/Steps?|-steps?|_steps?/.test(name)) {
             fileProcessor.processFile(path.resolve(__dirname, file), function(stepFile) {
                 stepFile.execute(library, chai, driver);
             });

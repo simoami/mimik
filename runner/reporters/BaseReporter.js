@@ -40,7 +40,7 @@ function getAnnotations(annotations) {
     return arr;
 }
 
-function Reporter(runner, options) {
+function Reporter(runner) {
     var me = this,
         stats = this.stats = {
             features: 0,
@@ -65,7 +65,7 @@ function Reporter(runner, options) {
         return;
     }
     me.runner = runner;
-    me.options = options;
+    me.options = runner.options;
 
     runner.stats = stats;
 
@@ -76,12 +76,13 @@ function Reporter(runner, options) {
     runner.on('feature', function(data) {
         stats.features++;
         data.suite._reporterData = {
-            title: data.feature.title,
-            feature: data.feature,
-            driver: data.driver,
             annotations: getAnnotations(data.feature.annotations),
+            driver: data.driver,
+            feature: data.feature,
+            profile: data.profile,
             scenarios: [],
             suite: data.suite,
+            title: data.feature.title,
             stats: {
                 tests: 0,
                 start: new Date(),
@@ -219,7 +220,7 @@ function Reporter(runner, options) {
     // runner.on('feature end', function(data) {
     //     //data { feature, suite, failures}
     // });
-};
+}
 Reporter.prototype.process = function(stats, cb) {
     // instantiate
     if(typeof cb === 'function') {
@@ -232,8 +233,5 @@ Reporter.prototype.getTopSuite = function(suite) {
         parent = parent.parent;
     }
     return parent ? parent.suites[0] : null;
-};
-Reporter.prototype.getTestScenario = function(stats, cb) {
-    
 };
 exports = module.exports = { name: 'base', proto: Reporter };

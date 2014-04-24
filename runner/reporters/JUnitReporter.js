@@ -5,13 +5,13 @@ var fs = require('fs'),
     logger = require('winston').loggers.get('mimik'),
     dot = require('dot');
 
-function Reporter(runner, options) {
+function Reporter(runner, config) {
     var me = this;
     if (!runner) {
         return;
     }
     me.runner = runner;
-    me.options = options;
+    me.options = runner.options;
 }
 
 Reporter.prototype.process = function(stats, targetPath, callback) {

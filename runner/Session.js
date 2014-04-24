@@ -77,12 +77,14 @@ Session.prototype.executeFeature = function(callback) {
                 var data = { 
                     feature: feature,
                     suite: suite,
-                    driver: me.driver
+                    driver: me.driver,
+                    profile: me.profile
                 };
                 me.emit('feature', data);
                 var stepFile = me.getStepFile(me.featureFile);
                 //var libraries = me.getFeatureRequires(feature);
                 stepFileProcessor.processFile(stepFile, function(file) {
+                    // TODO enable language support
                     var dictionary = new Yadda.Dictionary().define('NUM', /(\d+)/),
                         library = English.library(dictionary);
                     file.execute(library, chai, me.driver, stepFileProcessor);
@@ -132,10 +134,10 @@ Session.prototype.getFeatureRequires = function(feature) {
 
 Session.prototype.getStepFile = function(file) {
     var basename = path.basename(file, '.feature'),
-        re = new RegExp('^' + basename + '(Steps?|-steps?)'),
+        re = new RegExp('^' + basename + '(Steps?|-steps?|_steps?)'),
         stepFile;
     this.options.stepFiles.every(function(file) {
-        var name = path.basename(file);        
+        var name = path.basename(file);
         if(re.test(name)) {
             stepFile = file;
             return false;
