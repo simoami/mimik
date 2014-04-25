@@ -127,9 +127,9 @@ function filterFiles(files, params) {
  * scan and filter through passed file paths to retrieve tests.
  */
 function getTestFiles(args, options) {
-    // default files to tests/**/*.{feature,js,coffee}
+    // default files to ./**/*.{feature,js,coffee}
     var files = [];
-    args = args.length > 0 ? args : ['tests'];
+    args = args.length > 0 ? args : ['.'];
     args.forEach(function(arg){
        files = files.concat(scanFiles(arg));
     });
@@ -266,36 +266,7 @@ logger = getLogger(utils.copyTo({}, program, 'debug,log'));
 
 processCommand(cmd);
 
-
-
 /*
-
-var p = argv.browsers,
-    beforeCommand = argv.pre;
-
-
-/*
- * Run Tests
- * /
-if(p) {
-    var browserProfiles = scanProfiles(p);
-    runTests('tests');
-}
-
-/*
- * FUNCTIONS
- * /
-function runTestsx(path) {
-	console.log();
-	startTime = new Date();
-    walkTree(path, function(err, results) {
-        if (err) {
-            throw err;
-        }
-        results.forEach(runTest);
-        displayRunSummary();
-    });    
-}
 function displayRunSummary() {
     var browsers = browserProfiles.length,
 		duration = new Date() - startTime,
@@ -310,60 +281,5 @@ function displayRunSummary() {
     console.log('Tests took %s', toSeconds(duration));
     console.log();
 }
-function walkTree(dir, done) {
-    var results = [];
-    fs.readdir(dir, function (err, list) {
-        if (err) return done(err);
-        var i = 0;
-        (function next() {
-            var file = list[i++];
-            if (!file) return done(null, results);
-            file = dir + '/' + file;
-            fs.stat(file, function (err, stat) {
-                if (stat && stat.isDirectory()) {
-                    walkTree(file, function (err, res) {
-                        results = results.concat(res);
-                        next();
-                    });
-                } else {
-                    results.push(file);
-                    next();
-                }
-            });
-        })();
-    });
-}
 
-function runTest(test) {
-    var testName = test;
-    console.log("**** Test Name: ", testName.green);
-    console.log();
-    browserProfiles.forEach(function (file) {
-        console.log("     BROWSER PROFILE: ", path.basename(file, '.conf').green);
-        var counter = 1;
-        if(beforeCommand) {
-            console.log(('     '+counter+'.').green, ' running command: ', beforeCommand);
-            execute(beforeCommand);
-            counter ++;
-        }
-        console.log(('     '+counter+'.').green, ' executing test: ', testName);
-        execute(['testee', '-c', file, 'http://localhost:8080/lite-web/test/index.html?test='+test].join(' '));
-        console.log();
-    });
-    totalTests++;
-}
-
-function scanProfiles(p) {
-	return fs.readdirSync(p).map(function (file) {
-        return path.join(p, file);
-    }).filter(function (file) {
-        return fs.statSync(file).isFile() && path.extname(file) === '.conf';
-    });
-}
-
-function execute(cmd) {
-	if(cmd) {
-		run(cmd);
-	}
-}
 */
