@@ -1,11 +1,11 @@
 {
   "name": "mimik",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "UI Automation made easy!",
-  "private": true,
   "main": "./bin/cli",
   "scripts": {
-    "start": "node app/index.js",
+    "web": "NODE_ENV=development node app/index.js",
+    "cmd": "NODE_ENV=development node bin/cli.js run",
     "pretest": "jshint --node --sloppy index.js lib/*.js lib/jute/*.js",
     "test": "mocha --recursive --reporter spec test/*",
     "coverage": "istanbul cover _mocha --recursive test/*"
@@ -94,5 +94,8 @@
     "superagent": "*",
     "express-debug": "~1.0.3"
   },
-  "license": "MIT"
+  "license": {
+      "type": "MIT",
+      "url": "https://github.com/simoami/mimik/blob/master/LICENSE"
+  }
 }

@@ -1,4 +1,26 @@
 /*jshint node:true*/
+/**
+ * TestRailReporter
+ *
+ * Supports reporting using annotations at feature or scenario level.
+ *
+ * Global configuration:
+ * Enable the reporter with the required parameters in a config file:
+ * "reporters": [
+ *    {
+ *         "name": "testrail",
+ *         "host": "http://testrail.somesever.com",
+ *         "username": "username",
+ *         "password": "somepassword"
+ *     }
+ * ]
+ * 
+ * Supported Annotations:
+ * @TestRailReporter=addResult(test_id). Example: @TestRailReporter=addResult(1234)
+ * @TestRailReporter=addResultForCase(run_id,case_id). Example: @TestRailReporter=addResultForCase(12,34)
+ * See http://docs.gurock.com/testrail-api2/reference-results for details
+ */
+
 var url = require('url'),
     async = require('async'),
     utils = require('../../lib/utils'),
@@ -166,10 +188,12 @@ Reporter.prototype.sendRequest = function (query, data, cb) {
           logger.debug('[testrail reporter] Request failed: %s', err);
           console.error('[testrail reporter] Request failed:', err);
       } else if (response.statusCode !== 200) {
+          var err = JSON.parse(body).error;
           logger.debug('[testrail reporter] Request failed: Returned with error code %s', response.statusCode);
-          logger.debug(body);
+          logger.debug(err);
+          logger.debug(query);
           console.error('[testrail reporter] Request failed: Returned with error code', response.statusCode);
-          console.error(body);
+          console.error('[testrail reporter]', err, query);
       } else {
           logger.info('[testrail reporter] Request successful!  Server responded with:', body);
       }
