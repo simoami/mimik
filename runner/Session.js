@@ -30,8 +30,8 @@ Session.prototype.start = function(cb) {
     // execute features after the browser is launched
     me.executeFeature(function(err) {
         if(err) {
-            logger.error('[session] An error has occurred during execution', err);
-            console.error('[session]  An error has occurred during execution', err);
+            logger.debug('[session] An error has occurred during execution: %s in %s', err.message, me.featureFile);
+            console.error('[session] An error has occurred during execution: %s in %s', err, me.featureFile);
         }
         logger.debug('[session] Done processing file ', me.featureFile);
         if(typeof cb === 'function') {
@@ -44,20 +44,19 @@ Session.prototype.stop = function(){
     
 };
 Session.prototype.executeFeature = function(callback) {
-    var me = this;
-
-    var testRunner = new Mocha({
-        ui: 'bdd',
-        //reporter: 'base',
-        reporter: 'spec',
-        useInlineDiffs: true,
-        //asyncOnly: true,
-        timeout: me.options.timeout,
-        bail: me.options.bail,
-        slow: me.options.slow
-    });
+    var me = this,
+        runnerContext = {},
+        testRunner = new Mocha({
+            ui: 'bdd',
+            //reporter: 'base',
+            reporter: 'spec',
+            useInlineDiffs: true,
+            //asyncOnly: true,
+            timeout: me.options.timeout,
+            bail: me.options.bail,
+            slow: me.options.slow
+        });
     me.testRunner = testRunner;
-    var runnerContext = {};
     // workaround to export describe, before, after handlers globally
     testRunner.suite.emit('pre-require', runnerContext, null, testRunner);
     
@@ -68,40 +67,47 @@ Session.prototype.executeFeature = function(callback) {
     async.series([
         //startBrowser,
         function(cb) {
-            runnerContext.featureFile(me.featureFile, function(feature) {
-                var suite = testRunner.suite.suites[0];
-                suite.feature = feature;
-                //feature.suite = suite; // cross-reference
-                me.feature = feature;
-                feature.file = me.featureFile;
-                var data = { 
-                    feature: feature,
-                    suite: suite,
-                    driver: me.driver,
-                    profile: me.profile
-                };
-                me.emit('feature', data);
-                var stepFile = me.getStepFile(me.featureFile);
-                //var libraries = me.getFeatureRequires(feature);
-                stepFileProcessor.processFile(stepFile, function(file) {
-                    // TODO enable language support
-                    var dictionary = new Yadda.Dictionary().define('NUM', /(\d+)/),
-                        library = English.library(dictionary);
-                    file.execute(library, chai, me.driver, stepFileProcessor);
-                    var yadda = new Yadda.Yadda(library);
+            try {
+                runnerContext.featureFile(me.featureFile, function(feature) {
+                    var suite = testRunner.suite.suites[0];
+                    suite.feature = feature;
+                    //feature.suite = suite; // cross-reference
+                    me.feature = feature;
+                    feature.file = me.featureFile;
+                    var data = { 
+                        feature: feature,
+                        suite: suite,
+                        driver: me.driver,
+                        profile: me.profile
+                    };
+                    me.emit('feature', data);
+                    var stepFile = me.getStepFile(me.featureFile);
+                    //var libraries = me.getFeatureRequires(feature);
+                    stepFileProcessor.processFile(stepFile, function(file) {
+                        // TODO enable language support
+                        var dictionary = new Yadda.Dictionary().define('NUM', /(\d+)/),
+                            library = English.library(dictionary);
+                        file.execute(library, chai, me.driver, stepFileProcessor);
+                        var yadda = new Yadda.Yadda(library);
 
-                    runnerContext.scenarios(feature.scenarios, function(scenario) {
-                        //yadda.yadda(scenario.steps);
-                        runnerContext.steps(scenario.steps, function(step, done) {
-                            yadda.yadda(step, done);
+                        runnerContext.scenarios(feature.scenarios, function(scenario) {
+                            //yadda.yadda(scenario.steps);
+                            runnerContext.steps(scenario.steps, function(step, done) {
+                                yadda.yadda(step, done);
+                            });
                         });
+                        cb(null, feature);
                     });
-                    cb(null, feature);
                 });
-            });
-        }], 
+            } catch(err) {
+                cb(err);
+            }
+        }],
         function(err, results) {
-            
+            if(err) {
+                callback(err);
+                return;
+            }
             var feature = results[0];
             var runner = testRunner.run(function(failures) {
                 var suite = testRunner.suite.suites[0];
@@ -112,9 +118,6 @@ Session.prototype.executeFeature = function(callback) {
                 };
                 me.emit('feature end', data);
                 callback(null, data);
-                // process.on('exit', function   () {
-                //     process.exit(failures);
-                // });
             });
             runner.on('suite', function(suite) { me.emit('suite', suite); });
             runner.on('suite end', function(suite) { me.emit('suite end', suite); });
