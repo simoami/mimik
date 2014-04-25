@@ -1,5 +1,4 @@
-var path = require('path');
-// BEGIN HEADER //
+/*jshint node:true*/ /*global require:true */ var path = require('path');
 function execute(library, chai, driver, fileProcessor) {
     var origRequire = require;
     require = function(file) {
@@ -13,19 +12,10 @@ function execute(library, chai, driver, fileProcessor) {
         }
     };
     // Available DSL
-    var Given = library.given;
-    var When = library.when;
-    var Then = library.then;
-    var And = global.But = global.I = global.Define = library.define;
-    var client = driver.getClient();
-    //global.chai = chai.chai;
-    var expect = chai.expect;
-    var should = chai.should;
-    // END OF HEADER //
+    /*jshint unused:false */
+    var Given = library.given, When = library.when, Then = library.then, And = global.But = global.I = global.Define = library.define, client = driver.getClient(), expect = chai.expect, should = chai.should; /* END OF HEADER */
 
 /*BODY*/
 
 }
-// BEGIN FOOTER //
-module.exports.execute = execute;
-// END OF FOOTER //
+/* BEGIN FOOTER */ module.exports.execute = execute; /* END OF FOOTER */

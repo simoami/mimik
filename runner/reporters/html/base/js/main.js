@@ -48,7 +48,7 @@
             el.find('.code-error-stack').slideUp(200);
         }
     };
-    Mimik.prototype.initScreenshots = function(e) {
+    Mimik.prototype.initScreenshots = function() {
         $("a[rel^='screenshot']").prettyPhoto({
             opacity: 0, /* Value between 0 and 1 */
             social_tools: ''
@@ -72,7 +72,32 @@ var config = {
 };
 
 function renderPie(data, config) {
+
+    function getLabel(d, config) {
+        var threshold = config.threshold || 0;
+        var toPercent = d3.format(config.round ? '%' : '.01%');
+        var percent = d.value / config.total;
+        var labelTypes = {
+            "label" : d.label || (d.data && d.data.label) || '',
+            "value": d.value,
+            "percent": toPercent(percent)
+        };
+        return (typeof d.value === 'number' && percent >= threshold) ? labelTypes[config.type || 'value'] : '';
+    }
     
+    function pieTween(d) {
+        var s0 = 2 * Math.PI,
+            e0 = 2 * Math.PI,
+            fn = d3.interpolate(
+                { startAngle: s0, endAngle: e0 }, 
+                { startAngle: d.startAngle, endAngle: d.endAngle }
+            );
+        return function(t) {
+            var b = fn(t);
+            return arc(b);
+        };
+    }
+        
     var radius = Math.min(config.width, config.height) / 2,
         outerRadius = radius-10,
         donutRatio = 0.5,
@@ -190,31 +215,6 @@ function renderPie(data, config) {
           .attr("y", 9)
           .attr("dy", ".35em")
           .text(function(d) { return d.label; });
-   
-    function getLabel(d, config) {
-        var threshold = config.threshold || 0;
-        var toPercent = d3.format(config.round ? '%' : '.01%');
-        var percent = d.value / config.total;
-        var labelTypes = {
-            "label" : d.label || (d.data && d.data.label) || '',
-            "value": d.value,
-            "percent": toPercent(percent)
-        };
-        return (typeof d.value === 'number' && percent >= threshold) ? labelTypes[config.type || 'value'] : '';
-    }
-    
-    function pieTween(d) {
-        var s0 = 2 * Math.PI,
-            e0 = 2 * Math.PI,
-            fn = d3.interpolate(
-                { startAngle: s0, endAngle: e0 }, 
-                { startAngle: d.startAngle, endAngle: d.endAngle }
-            );
-        return function(t) {
-            var b = fn(t);
-            return arc(b);
-        };
-    }
 
 }
 

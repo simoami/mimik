@@ -1,0 +1,12 @@
+node_modules/**
+**/vendor/**
+examples/**
+test/**
+tests/**
+client/**
+app/**
+reports/**
+*.min.js
+*-min.js
+*/*.min.js
+*/*-min.js

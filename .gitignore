@@ -1,7 +1,25 @@
+# Repository management
+.svn
+
+# Editors
+*~
+\#*#
+.#*
+.*.swp
+## Sublime
+sublime-*
+
 # Logs
 logs
 *.log
 *.dat
+reports
+
+# Operating systems
+## Mac OS X
+.DS_Store
+## Windows
+Thumbs.db
 
 # Runtime data
 pids
@@ -14,9 +32,6 @@ coverage
 # Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
 
-# Compiled binary addons (http://nodejs.org/api/addons.html)
-build/Release
-
 # Dependency directory
 node_modules
- 
+

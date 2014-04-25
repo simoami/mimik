@@ -8,7 +8,8 @@
     "cmd": "NODE_ENV=development node bin/mimik run",
     "pretest": "jshint --node --sloppy index.js lib/*.js lib/jute/*.js",
     "test": "mocha --recursive --reporter spec test/*",
-    "coverage": "istanbul cover _mocha --recursive test/*"
+    "coverage": "istanbul cover _mocha --recursive test/*",
+    "lint": "jshint bin/ lib/ runner/*.js runner/drivers/*.js runner/reporters/*.js"
   },
   "bin": {
     "mimik": "./bin/mimik"

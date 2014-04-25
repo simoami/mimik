@@ -1,3 +1,4 @@
+/*jshint node:true*/
 /**
  * Browser Queue
  * implements a basic serial queue to schedule the next free browser for e-to-e testing
@@ -29,11 +30,11 @@ BQ.prototype.release = function(b) {
    var index = this.used.indexOf(b);
    this.used.splice(index, 1);
    this.available.push(b);
-}
+};
 
 BQ.prototype.reset = function() {
   this.used = [];
-  this.available = Array.prototype.concat([],elements);
-}
+  this.available = Array.prototype.concat([], this.elements);
+};
 
 exports = module.exports = BQ;

@@ -35,7 +35,7 @@ Runner.prototype.run = function (cb) {
         // default mode
         me.runTestStrategy(cb);
     }
-}
+};
 Runner.prototype.runBrowserStrategy = function(cb) {
     var me = this;
     //me.preProcessDrivers();
@@ -125,7 +125,7 @@ Runner.prototype.preProcessReporters = function() {
         if(reporter.name !== 'base') {
             reps.push(reporter);
         }
-    })
+    });
     utils.each(reps, function(rep) {
         Reporter = reporters[rep.name];
         if(Reporter) {

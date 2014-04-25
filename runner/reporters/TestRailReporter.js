@@ -188,12 +188,12 @@ Reporter.prototype.sendRequest = function (query, data, cb) {
           logger.debug('[testrail reporter] Request failed: %s', err);
           console.error('[testrail reporter] Request failed:', err);
       } else if (response.statusCode !== 200) {
-          var err = JSON.parse(body).error;
+          var error = JSON.parse(body).error;
           logger.debug('[testrail reporter] Request failed: Returned with error code %s', response.statusCode);
-          logger.debug(err);
+          logger.debug(error);
           logger.debug(query);
           console.error('[testrail reporter] Request failed: Returned with error code', response.statusCode);
-          console.error('[testrail reporter]', err, query);
+          console.error('[testrail reporter]', error, query);
       } else {
           logger.info('[testrail reporter] Request successful!  Server responded with:', body);
       }
