@@ -45,7 +45,7 @@ Session.prototype.stop = function(){
 };
 Session.prototype.executeFeature = function(callback) {
     var me = this,
-        runnerContext = {},
+        context = {},
         testRunner = new Mocha({
             ui: 'bdd',
             //reporter: 'base',
@@ -58,51 +58,17 @@ Session.prototype.executeFeature = function(callback) {
         });
     me.testRunner = testRunner;
     // workaround to export describe, before, after handlers globally
-    testRunner.suite.emit('pre-require', runnerContext, null, testRunner);
+    testRunner.suite.emit('pre-require', context, null, testRunner);
     
     Yadda.plugins.mocha.AsyncStepLevelPlugin.init({
-        container: runnerContext
+        container: context
     });
     
     async.series([
-        //startBrowser,
         function(cb) {
-            try {
-                runnerContext.featureFile(me.featureFile, function(feature) {
-                    var suite = testRunner.suite.suites[0];
-                    suite.feature = feature;
-                    //feature.suite = suite; // cross-reference
-                    me.feature = feature;
-                    feature.file = me.featureFile;
-                    var data = { 
-                        feature: feature,
-                        suite: suite,
-                        driver: me.driver,
-                        profile: me.profile
-                    };
-                    me.emit('feature', data);
-                    var stepFile = me.getStepFile(me.featureFile);
-                    //var libraries = me.getFeatureRequires(feature);
-                    stepFileProcessor.processFile(stepFile, function(file) {
-                        // TODO enable language support
-                        var dictionary = new Yadda.Dictionary().define('NUM', /(\d+)/),
-                            library = English.library(dictionary);
-                        file.execute(library, chai, me.driver, stepFileProcessor);
-                        var yadda = new Yadda.Yadda(library);
-
-                        runnerContext.scenarios(feature.scenarios, function(scenario) {
-                            //yadda.yadda(scenario.steps);
-                            runnerContext.steps(scenario.steps, function(step, done) {
-                                yadda.yadda(step, done);
-                            });
-                        });
-                        cb(null, feature);
-                    });
-                });
-            } catch(err) {
-                cb(err);
-            }
-        }],
+            me.parseFeature(testRunner, context, cb);
+        }
+        ],
         function(err, results) {
             if(err) {
                 callback(err);
@@ -130,11 +96,51 @@ Session.prototype.executeFeature = function(callback) {
     );
 };
 
-Session.prototype.getFeatureRequires = function(feature) {
-    var require = feature.annotations.require;
-    return require ? require.split(',').reduce(this.loadFile, []) : [];
-};
+Session.prototype.parseFeature = function(testRunner, context, cb) {
+    var me = this;
+    try {
+        context.featureFile(me.featureFile, function(feature) {
+            var suite = testRunner.suite.suites[0];
+            suite.feature = feature;
+            //feature.suite = suite; // cross-reference
+            me.feature = feature;
+            feature.file = me.featureFile;
+            var data = { 
+                feature: feature,
+                suite: suite,
+                driver: me.driver,
+                profile: me.profile
+            };
+            me.emit('feature', data);
+            var stepFile = me.getStepFile(me.featureFile);
+            //var libraries = me.getFeatureRequires(feature);
+            stepFileProcessor.processFile(stepFile, function(file) {
+                // TODO enable language support
+                var dictionary = new Yadda.Dictionary().define('NUM', /(\d+)/),
+                    library = English.library(dictionary);
+                file.execute(library, chai, me.driver, stepFileProcessor);
+                var yadda = new Yadda.Yadda(library);
 
+                context.scenarios(feature.scenarios, function(scenario) {
+                    //yadda.yadda(scenario.steps);
+                    context.steps(scenario.steps, function(step, done) {
+                        yadda.yadda(step, done);
+                    });
+                });
+                cb(null, feature);
+            });
+        });
+    } catch(err) {
+        cb(err);
+    }
+};
+// TODO enable support for feature import "@GivenFeature"
+/*
+Session.prototype.getFeatureRequires = function(feature) {
+    var GivenFeature = feature.annotations.GivenFeature;
+    return GivenFeature ? GivenFeature.split(',').reduce(this.loadFile, []) : [];
+};
+*/
 Session.prototype.getStepFile = function(file) {
     var basename = path.basename(file, '.feature'),
         re = new RegExp('^' + basename + '(Steps?|-steps?|_steps?)'),
