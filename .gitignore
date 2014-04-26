@@ -1,4 +1,23 @@
-# Repository management
+# Logs & reports
+logs
+*.log
+*.dat
+reports
+coverage
+
+# Operating systems
+## Mac OS X
+.DS_Store
+## Windows
+Thumbs.db
+
+# Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# Dependency directory
+node_modules
+
+# Source control
 .svn
 
 # Editors
@@ -8,30 +27,3 @@
 .*.swp
 ## Sublime
 sublime-*
-
-# Logs
-logs
-*.log
-*.dat
-reports
-
-# Operating systems
-## Mac OS X
-.DS_Store
-## Windows
-Thumbs.db
-
-# Runtime data
-pids
-*.pid
-*.seed
-
-# Coverage directory used by tools like istanbul
-coverage
-
-# Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
-.grunt
-
-# Dependency directory
-node_modules
-

@@ -4,6 +4,64 @@ var Table = require('cli-table'),
     utils = require('../../lib/utils'),
     tty = require('tty');
 
+function buildStep(test) {
+    return {
+        title: test.title,
+        start: test.start,
+        stop: null,
+        duration: 0,
+        success: false,
+        pending: false,
+        speed: null,
+        test: test
+    };
+}
+
+function toSeconds(d) {
+    d = d || 0;
+    var i = Math.floor(d/1000),
+        f = Math.round((d-i*1000)/10);
+    return i + '.' + f + 's';
+}
+
+function pluralize(singular, plural, count) {
+	return count === 1 ? singular : plural;
+}
+
+function getSeparator(len, symbol) {
+    symbol = symbol || '-';
+    var out = '';
+    while(len--) {
+        out += symbol;
+    }
+    return out;
+}
+
+function getAnnotation(key, value) {
+
+  var type = typeof value,
+      txt = '@' + key + (type !== 'boolean' ? '="' + value + '"' : '');
+
+  return {
+    key: key,
+    value: value,
+    type: type,
+    txt: txt
+  };
+}
+
+function getAnnotations(annotations) {
+    var arr = [], keys = {};
+    utils.each(annotations, function(value,key) {
+        // eliminate duplicates
+        if(!keys[key.toLowerCase()]) {
+            arr.push(getAnnotation(key, value));
+            keys[key.toLowerCase()] = true;
+        }
+    });
+    return arr;
+}
+
 function Reporter(runner, config) {
     var me = this,
         stats = this.stats = {
@@ -219,61 +277,4 @@ Reporter.prototype.process = function(stats, cb) {
     }
 };
 
-function buildStep(test) {
-    return {
-        title: test.title,
-        start: test.start,
-        stop: null,
-        duration: 0,
-        success: false,
-        pending: false,
-        speed: null,
-        test: test
-    };
-}
-
-function toSeconds(d) {
-    d = d || 0;
-    var i = Math.floor(d/1000),
-        f = Math.round((d-i*1000)/10);
-    return i + '.' + f + 's';
-}
-
-function pluralize(singular, plural, count) {
-	return count === 1 ? singular : plural;
-}
-
-function getSeparator(len, symbol) {
-    symbol = symbol || '-';
-    var out = '';
-    while(len--) {
-        out += symbol;
-    }
-    return out;
-}
-
-function getAnnotation(key, value) {
-
-  var type = typeof value,
-      txt = '@' + key + (type !== 'boolean' ? '="' + value + '"' : '');
-
-  return {
-    key: key,
-    value: value,
-    type: type,
-    txt: txt
-  };
-}
-
-function getAnnotations(annotations) {
-    var arr = [], keys = {};
-    utils.each(annotations, function(value,key) {
-        // eliminate duplicates
-        if(!keys[key.toLowerCase()]) {
-            arr.push(getAnnotation(key, value));
-            keys[key.toLowerCase()] = true;
-        }
-    });
-    return arr;
-}
 exports = module.exports = { name: 'console', proto: Reporter };

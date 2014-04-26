@@ -5,11 +5,9 @@
   "main": "./bin/mimik",
   "scripts": {
     "web": "NODE_ENV=development node app/index.js",
-    "cmd": "NODE_ENV=development node bin/mimik run",
-    "pretest": "jshint --node --sloppy index.js lib/*.js lib/jute/*.js",
     "test": "mocha --recursive --reporter spec test/*",
     "coverage": "istanbul cover _mocha --recursive test/*",
-    "lint": "jshint bin/ lib/ runner/*.js runner/drivers/*.js runner/reporters/*.js"
+    "lint": "jshint ."
   },
   "bin": {
     "mimik": "./bin/mimik"
@@ -60,40 +58,25 @@
     "url": "git://github.com/simoami/mimik.git"
   },
   "dependencies": {
-    "socket.io": "~0.9.16",
-    "express": "~3.4.8",
-    "open": "0.0.4",
-    "http-route-proxy": "~0.1.1",
-    "dynamic-reverse-proxy": "~0.4.5",
-    "browser-logger": "~1.0.0",
-    "express-dot": "~0.1.0",
-    "http-proxy": "~1.0.2",
-    "assert": "~1.1.1",
-    "follow-redirects": "0.0.3",
-    "connect": "~2.13.0",
     "colors": "~0.6.2",
     "commander": "~2.1.0",
-    "glob": "~3.2.9",
+    "glob": "~3.2.8",
     "yadda": "~0.10.7",
-    "selenium-webdriver": "~2.40.0",
     "coffee-script": "~1.7.1",
     "async": "~0.2.10",
     "cli-table": "~0.3.0",
-    "mocha": "~1.18.2",
+    "mocha": "~1.17.1",
     "winston": "~0.7.3",
     "didyoumean": "~1.2.0",
-    "webdriverjs": "~1.5.1",
+    "webdriverjs": "~1.6.1",
     "dot": "~1.0.2",
-    "chai": "~1.9.1",
+    "chai": "~1.9.0",
     "fs-tools": "~0.2.11",
-    "moment": "~2.6.0"
+    "moment": "~2.6.0",
+    "request": "~2.34.0"
   },
   "devDependencies": {
-    "istanbul": "*",
-    "jshint": "*",
-    "should": "*",
-    "superagent": "*",
-    "express-debug": "~1.0.3"
+    "jshint": "~2.5.0"
   },
   "license": {
     "type": "MIT",
