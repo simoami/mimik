@@ -5,8 +5,8 @@
   "main": "./bin/mimik",
   "scripts": {
     "web": "NODE_ENV=development node app/index.js",
-    "test": "mocha --recursive --reporter spec test/*",
-    "coverage": "istanbul cover _mocha --recursive test/*",
+    "test": "mocha --recursive --reporter spec tests/*",
+    "coverage": "istanbul cover _mocha --recursive tests/*",
     "lint": "jshint ."
   },
   "bin": {
