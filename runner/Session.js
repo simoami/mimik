@@ -16,7 +16,7 @@ var Session = function(config) {
     this.driver = config.driver;
     this.featureFile = config.featureFile;
     this.profile = config.profile;
-    this.testRunner = null,
+    this.testRunner = null;
     this.feature = null;
     this.options = config.options;
 };

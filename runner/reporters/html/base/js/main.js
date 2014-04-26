@@ -1,5 +1,6 @@
+/*jshint browser: true,jquery: true*/
 /*global d3*/
-+(function() {
+(function() {
     var Mimik = function() {};
     Mimik.prototype.init = function() {
         var me = this;
