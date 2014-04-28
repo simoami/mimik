@@ -234,13 +234,30 @@ function runTests(targets) {
     this.runner = new Runner(config);
     this.runner.run(onRunComplete);
 }
-
+function generateSteps (file, language) {
+    var Yadda = require('yadda'),
+        StepDefinitionGenerator = require('../lib/StepDefinitionGenerator'),
+        generator = new StepDefinitionGenerator(language),
+        context = {
+            describe: function(text, next) { next(); }
+        };
+    Yadda.plugins.mocha.AsyncStepLevelPlugin.init({
+        container: context
+    });
+    context.featureFile(file, function(feature) {
+        var output = generator.generate(feature, '// {raw}\n{keyword}(\/{step}\/, function(done) {\n    done();\n});\n');
+        console.log(output);
+    });
+}
 function processCommand(cmd) {
     if(cmd.action === 'run') {
         logger.info('[command] execute "run" mode');
         runTests(cmd.args);
     } else if(cmd.action === 'web') {
         logger.info('[command] execute "web" mode');
+    } else if(cmd.action === 'generate') {
+        logger.info('[command] execute "generate" mode');
+        generateSteps(cmd.file, cmd.options.language);
     } else {
         console.error('  No command specified.');
         console.error('  ---------------------');
