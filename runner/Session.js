@@ -26,7 +26,7 @@ var Session = function(config) {
 // Make Session an Observable
 utils.extend(Session, EventEmitter);
 
-Session.prototype.init = function (args) {
+Session.prototype.init = function () {
     var me = this,
         testRunner = new Mocha({
             ui: 'bdd',
@@ -45,7 +45,7 @@ Session.prototype.init = function (args) {
     Yadda.plugins.mocha.AsyncStepLevelPlugin.init({
         container: me.context
     });
-}
+};
 
 Session.prototype.loadFeature = function(featureFile, cb) {
     var me = this;
@@ -68,7 +68,8 @@ Session.prototype.loadFeature = function(featureFile, cb) {
         console.error('[session] %s in %s', err.message, featureFile);
         cb(err);
     }
-}
+};
+
 Session.prototype.start = function(cb) {
     var me = this;
     logger.debug('[session] Processing ' + me.featureFile + ' on ' + me.profile.desiredCapabilities.browserName);
