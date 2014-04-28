@@ -8,7 +8,7 @@ function wrapContent(content, cb) {
     if(!wrapper) {
         fs.readFile(path.join(__dirname, 'wrapper.js'), function(err, data) {
             if(err) {
-                console.error('Could not load wrapper file');
+                console.error('[stepfileprocessor] Could not load wrapper file');
                 console.error(err);
             } else {
                 wrapper = data.toString();
@@ -34,6 +34,10 @@ function stripBOM(content) {
 }
 
 function processFile(file, cb) {
+    if(!file) {
+        cb(new Error('processFile: A valid file path must be supplied'));
+        return;
+    }
     var targetModule,
         // Resolve full filename relative to the parent module
         targetPath = path.resolve(process.cwd(), file),
@@ -52,7 +56,7 @@ function processFile(file, cb) {
         // filename property is needed to resolve local paths in require() properly
         targetModule.filename = targetPath;
         targetModule._compile(newContent, targetPath);
-        cb(targetModule.exports);
+        cb(null, targetModule.exports);
     });
 }
 

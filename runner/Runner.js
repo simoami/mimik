@@ -83,28 +83,34 @@ Runner.prototype.runTestStrategy = function(cb) {
 };
 Runner.prototype.runFeatureFile = function (featureFile, profile, callback) {
     var me = this;
-    var driver = new drivers[profile.driver](me, me.options);
-    driver.init(profile);
-    driver.start(function(sessionId) {
-        var session = new Session({
-            driver: driver,
-            featureFile: featureFile,
-            profile: profile,
-            id: sessionId,
-            options: me.options
-        });
-        me.sessions[sessionId] = session;
-        me.setupListeners(session);
-        session.start(function(err, session) {
-            driver.stop(function() {
-                logger.debug('[runner] Closed Client Session Id', session.id);
-                if(typeof callback === 'function') {
-                    //console.log('CLOSING SESSION', session.id, profile.desiredCapabilities.browserName);
-                    callback(null, session);
-                }
-            });
-        });
+    var session = new Session({
+        featureFile: featureFile,
+        profile: profile,
+        options: me.options
     });
+    me.setupListeners(session);
+    session.loadFeature(featureFile, function(err, feature) {
+        if(err) {
+            return;
+        }
+        var driver = new drivers[profile.driver](me, me.options);
+        session.driver = driver;
+        driver.init(profile);
+        driver.start(function(sessionId) {
+            session.id = sessionId;
+            me.sessions[sessionId] = session;
+            session.start(function(err, session) {
+                driver.stop(function() {
+                    logger.debug('[runner] Closed Client Session Id', session.id);
+                    if(typeof callback === 'function') {
+                        //console.log('CLOSING SESSION', session.id, profile.desiredCapabilities.browserName);
+                        callback(null, session);
+                    }
+                });
+            });
+        });        
+    });
+
 };
 Runner.prototype.postRun = function(cb) {
     var me = this;

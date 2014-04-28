@@ -12,6 +12,7 @@ var async = require('async'),
 
 
 var Session = function(config) {
+    var me = this;
     this.id = config.id;
     this.driver = config.driver;
     this.featureFile = config.featureFile;
@@ -19,33 +20,14 @@ var Session = function(config) {
     this.testRunner = null;
     this.feature = null;
     this.options = config.options;
+    this.context = {};
+    me.init();
 };
 // Make Session an Observable
 utils.extend(Session, EventEmitter);
 
-Session.prototype.start = function(cb) {
-    var me = this;
-    logger.debug('[session] Processing ' + me.featureFile + ' on ' + me.profile.desiredCapabilities.browserName);
-    logger.debug('[session] Client Session Id', me.id);
-    // execute features after the browser is launched
-    me.executeFeature(function(err) {
-        if(err) {
-            logger.debug('[session] An error has occurred during execution: %s in %s', err.message, me.featureFile);
-            console.error('[session] An error has occurred during execution: %s in %s', err, me.featureFile);
-        }
-        logger.debug('[session] Done processing file ', me.featureFile);
-        if(typeof cb === 'function') {
-            cb(err, me);
-        }
-    });
-    
-};
-Session.prototype.stop = function(){
-    
-};
-Session.prototype.executeFeature = function(callback) {
+Session.prototype.init = function (args) {
     var me = this,
-        context = {},
         testRunner = new Mocha({
             ui: 'bdd',
             //reporter: 'base',
@@ -58,15 +40,58 @@ Session.prototype.executeFeature = function(callback) {
         });
     me.testRunner = testRunner;
     // workaround to export describe, before, after handlers globally
-    testRunner.suite.emit('pre-require', context, null, testRunner);
+    testRunner.suite.emit('pre-require', me.context, null, testRunner);
     
     Yadda.plugins.mocha.AsyncStepLevelPlugin.init({
-        container: context
+        container: me.context
+    });
+}
+
+Session.prototype.loadFeature = function(featureFile, cb) {
+    var me = this;
+    try {
+        me.context.featureFile(me.featureFile, function(feature) {
+            me.feature = feature;
+            feature.file = me.featureFile;
+            var data = { 
+                feature: feature,
+                suite: me.testRunner.suite.suites[0],
+                driver: me.driver,
+                profile: me.profile
+            };
+            me.emit('feature', data);
+            //var libraries = me.getFeatureRequires(feature);
+            cb(null, feature);
+        });
+    } catch(err) {
+        logger.debug('[session] %s in %s', err.message, featureFile);
+        console.error('[session] %s in %s', err.message, featureFile);
+        cb(err);
+    }
+}
+Session.prototype.start = function(cb) {
+    var me = this;
+    logger.debug('[session] Processing ' + me.featureFile + ' on ' + me.profile.desiredCapabilities.browserName);
+    logger.debug('[session] Client Session Id', me.id);
+    // execute features after the browser is launched
+    me.executeFeature(function(err) {
+        if(!err) {
+            logger.debug('[session] Done processing file ', me.featureFile);
+        }
+        if(typeof cb === 'function') {
+            cb(err, me);
+        }
     });
     
+};
+Session.prototype.stop = function(){
+    
+};
+Session.prototype.executeFeature = function(callback) {
+    var me = this;
     async.series([
         function(cb) {
-            me.parseFeature(testRunner, context, cb);
+            me.parseFeature(me.testRunner, cb);
         }
         ],
         function(err, results) {
@@ -75,8 +100,8 @@ Session.prototype.executeFeature = function(callback) {
                 return;
             }
             var feature = results[0];
-            var runner = testRunner.run(function(failures) {
-                var suite = testRunner.suite.suites[0];
+            var runner = me.testRunner.run(function(failures) {
+                var suite = me.testRunner.suite.suites[0];
                 var data = { 
                     feature: feature,
                     suite: suite,
@@ -96,10 +121,10 @@ Session.prototype.executeFeature = function(callback) {
     );
 };
 
-Session.prototype.parseFeature = function(testRunner, context, cb) {
+Session.prototype.parseFeature = function(testRunner, cb) {
     var me = this;
     try {
-        context.featureFile(me.featureFile, function(feature) {
+        me.context.featureFile(me.featureFile, function(feature) {
             var suite = testRunner.suite.suites[0];
             suite.feature = feature;
             //feature.suite = suite; // cross-reference
@@ -114,16 +139,30 @@ Session.prototype.parseFeature = function(testRunner, context, cb) {
             me.emit('feature', data);
             var stepFile = me.getStepFile(me.featureFile);
             //var libraries = me.getFeatureRequires(feature);
-            stepFileProcessor.processFile(stepFile, function(file) {
+            if(!stepFile) {
+                var err = new Error('No corresponding step definitions were found for feature "' +  path.basename(me.featureFile) + '"');
+                logger.debug('[session] %s', err.message);
+                console.error('[session] %s', err.message);
+                cb(err);
+                return;
+            }
+
+            stepFileProcessor.processFile(stepFile, function(err, file) {
+                if(err) {
+                    logger.debug('[session] %s', err.message);
+                    console.error('[session] %s', err.message);
+                    cb(err);
+                    return;
+                }
                 // TODO enable language support
                 var dictionary = new Yadda.Dictionary().define('NUM', /(\d+)/),
                     library = English.library(dictionary);
                 file.execute(library, chai, me.driver, stepFileProcessor);
                 var yadda = new Yadda.Yadda(library);
 
-                context.scenarios(feature.scenarios, function(scenario) {
+                me.context.scenarios(feature.scenarios, function(scenario) {
                     //yadda.yadda(scenario.steps);
-                    context.steps(scenario.steps, function(step, done) {
+                    me.context.steps(scenario.steps, function(step, done) {
                         yadda.yadda(step, done);
                     });
                 });
@@ -131,6 +170,8 @@ Session.prototype.parseFeature = function(testRunner, context, cb) {
             });
         });
     } catch(err) {
+        logger.debug('[session] %s', err.message);
+        console.error('[session] %s', err.message);
         cb(err);
     }
 };
