@@ -155,10 +155,11 @@ Session.prototype.parseFeature = function(testRunner, cb) {
                     cb(err);
                     return;
                 }
+                try {
                 // TODO enable language support
                 var dictionary = new Yadda.Dictionary().define('NUM', /(\d+)/),
                     library = English.library(dictionary);
-                file.execute(library, chai, me.driver, stepFileProcessor);
+                    file.execute(library, chai, me.driver, stepFileProcessor);
                 var yadda = new Yadda.Yadda(library);
 
                 me.context.scenarios(feature.scenarios, function(scenario) {
@@ -167,6 +168,12 @@ Session.prototype.parseFeature = function(testRunner, cb) {
                         yadda.yadda(step, done);
                     });
                 });
+                } catch(err) {
+                    logger.debug('[session] %s', err.stack);
+                    console.error('[session] %s', err.stack);
+                    cb(err);
+                    return;
+                }
                 cb(null, feature);
             });
         });
