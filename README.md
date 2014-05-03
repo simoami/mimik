@@ -42,9 +42,15 @@ Usage: mimik [options] [command]
     --log <path>                path including file name to create a file log
 ```
 
-## Tests
+## Examples
 
-  npm test
+See the [examples](https://github.com/simoami/mimik/tree/master/examples) folder
+
+## Running Tests
+
+```
+npm test
+```
 
 ## Maintainer
 
