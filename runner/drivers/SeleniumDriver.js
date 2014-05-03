@@ -59,10 +59,8 @@ Driver.prototype.start = function(cb) {
     var callback = function(err, body) {
         if(err) {
             if(typeof cb === 'function') {
-                logger.debug('[selenium driver] could not start browser', err);
-                console.log('could not start browser');
-                console.log(err);
-                cb(err);
+                logger.debug('[selenium driver] could not start browser ' + err.orgStatusMessage, err);
+                console.error('[selenium driver] ' + err.orgStatusMessage);
             }
         } else {
             logger.debug('[selenium driver] browser launched with configuration:', body);
