@@ -1,6 +1,8 @@
 ![Mimik](resources/images/mimik-logo-big.png?raw=true)
 
 [![Build Status](https://travis-ci.org/simoami/mimik.svg?branch=master)](https://travis-ci.org/simoami/mimik)
+[![Dependency Status](https://david-dm.org/simoami/mimik.svg)](https://david-dm.org/simoami/mimik)
+[![devDependency Status](https://david-dm.org/simoami/mimik/dev-status.svg)](https://david-dm.org/simoami/mimik#info=devDependencies)
 
 Mimik is a feature-rich UI automation platform which runs on the browser and Node.js.  It brings BDD style syntax to support Agile story-writing style allowing all stakehohlders to contribute to automation tests. Built on top of some of the best frameworks, it can solve real-world challenges.
 
