@@ -55,7 +55,7 @@ npm test
 ```
 ## License
 
-MIT. See [LICENSE-MIT](https://github.com/simoami/mimik/blob/master/LICENSE-MIT)".
+MIT. See [LICENSE-MIT](https://github.com/simoami/mimik/blob/master/LICENSE-MIT).
 
 
 ## Maintainer
