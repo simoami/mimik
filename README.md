@@ -46,21 +46,24 @@ Usage: mimik [options] [command]
 
 ## Examples
 
-See the [examples](https://github.com/simoami/mimik/tree/master/examples) folder
+See the [examples](./examples) folder
 
 ## Running Tests
 
 ```
 npm test
 ```
-## License
-
-MIT. See [LICENSE-MIT](https://github.com/simoami/mimik/blob/master/LICENSE-MIT).
-
 
 ## Maintainer
 
 [Simo Moujami](www.linkedin.com/in/simoami)
 
 
-## [Contributing](./CONTRIBUTING.md)
+## Contributing
+
+See [here](./CONTRIBUTING.md).
+
+## License
+
+MIT. See [LICENSE-MIT](./LICENSE-MIT).
+
