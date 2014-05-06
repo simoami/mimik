@@ -7,3 +7,6 @@ require('fs').readdirSync(__dirname + '/').forEach(function(file) {
         exports[obj.name] = obj.proto;
     }
 });
+exports.get = function(type) {
+    return exports[type];
+};

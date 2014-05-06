@@ -8,8 +8,7 @@ var async = require('async'),
     utils = require('../lib/utils'),
     EventEmitter = require('events').EventEmitter,
     logger = require('winston').loggers.get('mimik'),
-    reporters = require('./reporters'),
-    drivers = require('./drivers'),
+    ReporterFactory = require('./reporters'),
     BQ = require('./BrowserQueue'),
     Session = require('./Session');
 
@@ -18,11 +17,24 @@ function Runner(options) {
     options = options || {};
     me.options = options;
     me.reporters = {};
-    me.drivers = {};
     me.sessions = {};
     // process browser profiles
     me.processBrowserProfiles(me.options.browsers);
     EventEmitter.call(me, options);
+
+    // perform graceful shutdown on Ctrl+C
+    process.on('SIGINT', function () {
+        me.abort(function() {
+            process.exit(me.stats.failures > 0 ? 1 : 0);
+        });
+    });
+
+    // usually called with kill
+    process.on('SIGTERM', function () {
+        console.log('Parent SIGTERM detected (kill)');
+        // exit cleanly
+        process.exit(0);
+    });
 }
 // Make Runner an Observable
 utils.extend(Runner, EventEmitter);
@@ -89,26 +101,23 @@ Runner.prototype.runFeatureFile = function (featureFile, profile, callback) {
         options: me.options
     });
     me.setupListeners(session);
-    session.loadFeature(featureFile, function(err, feature) {
+    session.loadFeature(featureFile, function(err) {
         if(err) {
+            logger.debug('[runner] An error has occured while loading feature file ' + featureFile, err);
+            console.error('[runner] An error has occured while loading feature file ' + featureFile);
+            console.error(err.stack);
             return;
         }
-        var driver = new drivers[profile.driver](me, me.options);
-        session.driver = driver;
-        driver.init(profile);
-        driver.start(function(sessionId) {
-            session.id = sessionId;
-            me.sessions[sessionId] = session;
-            session.start(function(err, session) {
-                driver.stop(function() {
-                    logger.debug('[runner] Closed Client Session Id', session.id);
-                    if(typeof callback === 'function') {
-                        //console.log('CLOSING SESSION', session.id, profile.desiredCapabilities.browserName);
-                        callback(null, session);
-                    }
-                });
-            });
-        });        
+        session.start(function(err, session) {
+            if(err) {
+                logger.debug('[runner] Could not start session', err);
+                console.error('[runner] Could not start session');
+                console.error(err.stack);
+            } else {
+                me.sessions[session.id] = session;
+            }
+            callback(err, me);
+        });
     });
 
 };
@@ -124,7 +133,6 @@ Runner.prototype.postRun = function(cb) {
 };
 Runner.prototype.preProcessReporters = function() {
     var me = this,
-        Reporter,
         reps = [{ name: 'base'}];
     utils.each(me.options.reporters||[], function(reporter) {
         reporter = utils.isObject(reporter) ? reporter : { name: reporter };
@@ -133,7 +141,7 @@ Runner.prototype.preProcessReporters = function() {
         }
     });
     utils.each(reps, function(rep) {
-        Reporter = reporters[rep.name];
+        var Reporter = ReporterFactory.get(rep.name);
         if(Reporter) {
             me.reporters[rep.name] = new Reporter(me, rep);
         }
@@ -163,15 +171,21 @@ Runner.prototype.postProcessReporters = function(callback) {
     });
 };
 
-Runner.prototype.preProcessDrivers = function() {
+Runner.prototype.abort = function(cb) {
     var me = this;
-    utils.each(drivers, function(Driver, key) {
-        me.drivers[key] = new Driver(me, me.options);
-    });
+    logger.debug('[runner] Aborted execution');
+    console.log( '\nStopping Mimik...' );
+    me.abortActiveSessions(cb);
 };
 
-Runner.prototype.postProcessDrivers = function() {
+Runner.prototype.abortActiveSessions = function(callback) {
+    var me = this;
+    async.each(utils.keys(me.sessions), function(id, cb) {
+        me.sessions[id].abort(cb);
+        delete me.sessions[id];
+    }, callback);
 };
+
 Runner.prototype.setupListeners = function(source) {
     var me = this;
     source.on('feature', function(data) { me.emit('feature', data); });
@@ -183,7 +197,18 @@ Runner.prototype.setupListeners = function(source) {
     source.on('pass', function(test) { me.emit('pass', test); });
     source.on('fail', function(test, err) { me.emit('fail', test, err); });
     source.on('pending', function(test) { me.emit('pending', test); });
+    source.on('stop', function(err, session) {
+        if(err) {
+            logger.debug('[runner] Session '+ session.id + 'could not be closed', err);
+            console.error('[runner] Session '+ session.id + 'could not be closed');
+            console.error(err.stack);
+            return;
+        }
+        delete me.sessions[session.id];
+        logger.debug('[runner] Closed Client Session Id', session.id);
+    });
 };
+
 Runner.prototype.processBrowserProfiles = function (profiles) {
     var me = this;
     me.browserProfiles = [];
@@ -205,18 +230,4 @@ Runner.prototype.processBrowserProfiles = function (profiles) {
  * Export Runner
  */
 
-exports = module.exports = Runner;
-
-    /**
-     *  These are all the events you can subscribe to:
-     *   - `start`  execution started
-     *   - `end`  execution complete
-     *   - `suite`  (suite) test suite execution started
-     *   - `suite end`  (suite) all tests (and sub-suites) have finished
-     *   - `test`  (test) test execution started
-     *   - `test end`  (test) test completed
-     *   - `hook`  (hook) hook execution started
-     *   - `hook end`  (hook) hook complete
-     *   - `pass`  (test) test passed
-     *   - `fail`  (test, err) test failed
-     */
+module.exports = Runner;

@@ -4,6 +4,8 @@ var webdriverjs = require('webdriverjs'),
 
 function Driver(runner) {
     var me = this;
+    
+    me.state = 'stopped';
 
     if (!runner) {
         return;
@@ -56,19 +58,27 @@ Driver.prototype.init = function(options) {
  * Start the web browser
  */
 Driver.prototype.start = function(cb) {
+    var me = this;
+    if(me.state === 'started' || me.state === 'starting') {
+        process.nextTick(cb);
+        return;
+    }
     var callback = function(err, body) {
         if(err) {
+            me.state = 'stopped';
             if(typeof cb === 'function') {
                 logger.debug('[selenium driver] could not start browser ' + err.orgStatusMessage, err);
                 console.error('[selenium driver] ' + err.orgStatusMessage);
             }
         } else {
+            me.state = 'started';
             logger.debug('[selenium driver] browser launched with configuration:', body);
             if(typeof cb === 'function') {
                 cb(body.sessionId);
             }
         }
     };
+    me.state = 'starting';
     logger.debug('[selenium driver] browser starting...');   
     this.client.init(callback);
 };
@@ -76,15 +86,21 @@ Driver.prototype.start = function(cb) {
  * Stop the web browser
  */
 Driver.prototype.stop = function(cb) {
+    var me = this;
+    if(me.state === 'stopped' || me.state === 'stopping') {
+        process.nextTick(cb);
+        return;
+    }
     var callback = function() {
+        me.state = 'stopped';
         logger.debug('[selenium driver] browser closed');
         if(typeof cb === 'function') {
             cb();
         }
     };
     logger.debug('[selenium driver] browser closing...');
-    //this.client.pause(500).end(callback);
-    this.client.end(callback);
+    me.state = 'stopping';
+    me.client.end(callback);
 };
 /**
  * Return the WD client instance

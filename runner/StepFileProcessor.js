@@ -2,21 +2,23 @@
 var Module = require('module'),
     fs = require('fs'),
     path = require('path'),
+    logger = require('winston').loggers.get('mimik'),
     wrapper;
 
 function wrapContent(content, cb) {
     if(!wrapper) {
         fs.readFile(path.join(__dirname, 'wrapper.js'), function(err, data) {
             if(err) {
+                logger.debug('[stepfileprocessor] Could not load wrapper file', err);
                 console.error('[stepfileprocessor] Could not load wrapper file');
-                console.error(err);
+                console.error(err.stack);
             } else {
-                wrapper = data.toString();
-                cb(wrapper.replace('/*BODY*/', content));
+                wrapper = data.toString().split(/\r\n|\n/).join('');
+                cb(wrapper.replace('/*BODY*/', content + '\n'));
             }
         });
     } else {
-        cb(wrapper.replace('/*BODY*/', content));
+        cb(wrapper.replace('/*BODY*/', content + '\n'));
     }
 }
 
