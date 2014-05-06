@@ -74,6 +74,7 @@ Driver.prototype.start = function(cb) {
             me.state = 'started';
             logger.debug('[selenium driver] browser launched with configuration:', body);
             if(typeof cb === 'function') {
+                me.sessionId = body.sessionId;
                 cb(body.sessionId);
             }
         }
@@ -87,7 +88,7 @@ Driver.prototype.start = function(cb) {
  */
 Driver.prototype.stop = function(cb) {
     var me = this;
-    if(me.state === 'stopped' || me.state === 'stopping') {
+    if(me.sessionId && (me.state === 'stopped' || me.state === 'stopping')) {
         process.nextTick(cb);
         return;
     }

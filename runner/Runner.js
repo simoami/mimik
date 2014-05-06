@@ -4,6 +4,8 @@
 /**
  * Module dependencies.
  */
+require("long-stack-traces")
+
 var async = require('async'),
     utils = require('../lib/utils'),
     EventEmitter = require('events').EventEmitter,
@@ -100,6 +102,7 @@ Runner.prototype.runFeatureFile = function (featureFile, profile, callback) {
         profile: profile,
         options: me.options
     });
+    me.sessions[session.getId()] = session;
     me.setupListeners(session);
     session.loadFeature(featureFile, function(err) {
         if(err) {
@@ -113,8 +116,6 @@ Runner.prototype.runFeatureFile = function (featureFile, profile, callback) {
                 logger.debug('[runner] Could not start session', err);
                 console.error('[runner] Could not start session');
                 console.error(err.stack);
-            } else {
-                me.sessions[session.id] = session;
             }
             callback(err, me);
         });
@@ -180,9 +181,10 @@ Runner.prototype.abort = function(cb) {
 
 Runner.prototype.abortActiveSessions = function(callback) {
     var me = this;
-    async.each(utils.keys(me.sessions), function(id, cb) {
-        me.sessions[id].abort(cb);
+    async.eachSeries(utils.keys(me.sessions), function(id, cb) {
+        var session = me.sessions[id];
         delete me.sessions[id];
+        session.abort(cb);
     }, callback);
 };
 

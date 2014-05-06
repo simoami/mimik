@@ -14,7 +14,7 @@ var fs = require('fs'),
 
 var Session = function(config) {
     var me = this;
-    me.id = config.id;
+    me.id = me.getId();
     var Driver = DriverFactory.get(config.profile.driver);
     me.driver = new Driver(me, config.options);
     me.featureFile = config.featureFile;
@@ -24,10 +24,19 @@ var Session = function(config) {
     me.options = config.options;
     me.context = {};
     me.aborted = false;
+    me.state = 'stopped';
     me.init();
 };
 // Make Session an Observable
 utils.extend(Session, EventEmitter);
+
+Session.prototype.getId = function() {
+    if(this.id) {
+        return this.id;
+    }
+    var now = new Date(); 
+    return (now.getTime()).toString(10).toUpperCase();
+};
 
 Session.prototype.init = function () {
     var me = this,
@@ -53,11 +62,25 @@ Session.prototype.init = function () {
 
 Session.prototype.start = function(cb) {
     var me = this;
-    me.emit('start', me);
+    if(me.aborted) {
+        return;
+    }
+    if(me.state === 'started' || me.state === 'starting') {
+        process.nextTick(function() {
+            var err = new Error('Session start has already been called.');
+            cb(err);
+        });
+        return;
+    }
+    me.state = 'starting';
     me.driver.start(function(sessionId) {
-        me.id = sessionId;
+        me.state = 'started';
+        me.emit('start', me);
+        me.driverSessionId = sessionId;
         logger.debug('[session] Started session ' + me.id + ' on ' + me.profile.desiredCapabilities.browserName);    
-    
+        if(me.aborted) {
+            return;
+        }
         // execute features after the browser is launched
         me.executeFeature(me.feature, function(err, me) {
             if(!err) {
@@ -75,10 +98,25 @@ Session.prototype.start = function(cb) {
  */
 Session.prototype.stop = function(cb){
     var me = this;
+    if(me.state === 'stopped' || me.state === 'stopping') {
+        process.nextTick(function() {
+            var err = new Error('Session stop has already been called.');
+            cb(err);
+        });
+        return;
+    }
+    if(me.state === 'starting') {
+        me.once('start', function() {
+            me.stop();
+        });
+        return;
+    }    
+    me.state = 'stopping';
     me.driver.stop(function(err) {
         if(!err) {
             logger.debug('[session] feature testing completed', me.featureFile);
         }
+        me.state = 'stopped';
         me.emit('stop', err, me);
         if(typeof cb === 'function') {
             cb.call(me, err, me);
@@ -91,13 +129,13 @@ Session.prototype.stop = function(cb){
  */
 Session.prototype.abort = function(cb){
     // 1. halt test execution first
-    // TODO
-    this.aborted = true;
-    if(this.testRunner) {
-        this.testRunner.abort();
+    var me = this;
+    me.aborted = true;
+    if(me.testRunner) {
+        me.testRunner.abort();
     }
-    // 2. stop driver
-    this.stop(cb);
+    // 2. stop the driver
+    me.stop(cb);
 };
 
 Session.prototype.executeFeature = function(feature, callback) {
