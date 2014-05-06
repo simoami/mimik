@@ -4,7 +4,6 @@
 /**
  * Module dependencies.
  */
-require("long-stack-traces")
 
 var async = require('async'),
     utils = require('../lib/utils'),
@@ -111,7 +110,7 @@ Runner.prototype.runFeatureFile = function (featureFile, profile, callback) {
             console.error(err.stack);
             return;
         }
-        session.start(function(err, session) {
+        session.start(function(err) {
             if(err) {
                 logger.debug('[runner] Could not start session', err);
                 console.error('[runner] Could not start session');
