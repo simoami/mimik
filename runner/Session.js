@@ -11,6 +11,7 @@ var fs = require('fs'),
     English = Yadda.localisation.English,
     chai = require('chai');
 
+//Error.stackTraceLimit = Infinity;
 
 var Session = function(config) {
     var me = this;
@@ -66,6 +67,9 @@ Session.prototype.start = function(cb) {
         return;
     }
     if(me.state === 'started' || me.state === 'starting') {
+        logger.debug('[session] Session start has already been called.');
+        console.error('[session] Session start has already been called.');
+        
         process.nextTick(function() {
             var err = new Error('Session start has already been called.');
             cb(err);
@@ -143,10 +147,11 @@ Session.prototype.executeFeature = function(feature, callback) {
     if(!feature) {
         process.nextTick(function() {
             var err = new Error('feature is a required argument for execution');
-            callback(err, me);
+            callback(err);
         });
+        return;
     }
-    
+
     stepFileProcessor.processFile(me.stepFile, function(err, file) {
         if(err) {
             return callback(err);
@@ -155,7 +160,8 @@ Session.prototype.executeFeature = function(feature, callback) {
             // TODO enable language support
             var dictionary = new Yadda.Dictionary()
                     .define('NUM', /(\d+)/)
-                    .define('STRING', /([^'"]*)/),
+                    .define('STR', /(.*)/)
+                    .define('QSTR', /([^\'\"]*)/),
                 library = English.library(dictionary);
             file.execute(library, chai, me.driver, stepFileProcessor);
             var yadda = new Yadda.Yadda(library);
@@ -189,11 +195,11 @@ Session.prototype.executeFeature = function(feature, callback) {
 
             me.testRunner = testRunner;
             me.setupListeners(testRunner);
-            
+
         } catch(err) {
-            logger.debug('[session] %s', err.stack);
-            console.error('[session] %s', err.stack);
-            console.error(err.stack);
+            logger.debug('[session] Could not execute feature "' +  path.basename(me.featureFile) + '"', err.message);
+            console.error('[session] Could not execute feature "' +  path.basename(me.featureFile) + '"');
+            console.error(err.message);
             callback(err);
         }
     });

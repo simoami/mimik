@@ -22,6 +22,7 @@ var execute = function execute(library, chai, driver, fileProcessor) {
             };
         };
         Given = _define(library.given);
+        And = _define(library.given);
         When = _define(library.when);
         Then = _define(library.then);
         Define = _define(library.define);

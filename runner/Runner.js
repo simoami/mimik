@@ -111,11 +111,6 @@ Runner.prototype.runFeatureFile = function (featureFile, profile, callback) {
             return;
         }
         session.start(function(err) {
-            if(err) {
-                logger.debug('[runner] Could not start session', err);
-                console.error('[runner] Could not start session');
-                console.error(err.stack);
-            }
             callback(err, me);
         });
     });
