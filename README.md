@@ -1,4 +1,4 @@
-![Mimik](resources/images/mimik-logo-big.png?raw=true)
+![Mimik](https://cloud.githubusercontent.com/assets/2038264/2922406/428777b0-d701-11e3-8ef1-a11834e93fa5.png)
 
 [![Build Status](https://travis-ci.org/simoami/mimik.svg?branch=master)](https://travis-ci.org/simoami/mimik)
 [![Dependency Status](https://david-dm.org/simoami/mimik.svg)](https://david-dm.org/simoami/mimik)
@@ -55,7 +55,7 @@ npm test
 
 ## Maintainer
 
-[Simo Moujami](www.linkedin.com/in/simoami)
+[Simo Moujami](http://www.linkedin.com/in/simoami)
 
 
 ## Contributing
