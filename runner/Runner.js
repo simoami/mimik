@@ -4,7 +4,6 @@
 /**
  * Module dependencies.
  */
-
 var async = require('async'),
     utils = require('../lib/utils'),
     EventEmitter = require('events').EventEmitter,
@@ -12,6 +11,9 @@ var async = require('async'),
     ReporterFactory = require('./reporters'),
     BQ = require('./BrowserQueue'),
     Session = require('./Session');
+
+// Expose the View class globally so that loaded test files have access to it
+global.View = require('../lib/View');
 
 function Runner(options) {
     var me = this;

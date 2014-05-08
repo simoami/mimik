@@ -16,6 +16,7 @@ Thumbs.db
 
 # Dependency directory
 node_modules
+bower_components
 
 # Source control
 .svn
