@@ -55,7 +55,7 @@ npm test
 
 ## Maintainer
 
-[Simo Moujami](www.linkedin.com/in/simoami)
+[Simo Moujami](http://www.linkedin.com/in/simoami)
 
 
 ## Contributing
