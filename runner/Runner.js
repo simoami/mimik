@@ -17,6 +17,7 @@ global.View = require('../lib/View');
 
 function Runner(options) {
     var me = this;
+    me.state = 'stopped';
     options = options || {};
     me.options = options;
     me.reporters = {};
@@ -24,38 +25,29 @@ function Runner(options) {
     // process browser profiles
     me.processBrowserProfiles(me.options.browsers);
     EventEmitter.call(me, options);
-
-    // perform graceful shutdown on Ctrl+C
-    process.on('SIGINT', function () {
-        me.abort(function() {
-            process.exit(me.stats.failures > 0 ? 1 : 0);
-        });
-    });
-
-    // usually called with kill
-    process.on('SIGTERM', function () {
-        console.log('Parent SIGTERM detected (kill)');
-        // exit cleanly
-        process.exit(0);
-    });
 }
 // Make Runner an Observable
 utils.extend(Runner, EventEmitter);
 
 Runner.prototype.run = function (cb) {
     var me = this;
+    var callback = function() {
+        cb.call(me, arguments);
+    };
+    me.state = 'started';
+    me.emit('start');
+    
     if(me.options.testStrategy === 'browser') {
-        me.runBrowserStrategy(cb);
+        me.runBrowserStrategy(callback);
     } else {
         // default mode
-        me.runTestStrategy(cb);
+        me.runTestStrategy(callback);
     }
 };
 Runner.prototype.runBrowserStrategy = function(cb) {
     var me = this;
     //me.preProcessDrivers();
     me.preProcessReporters();
-    me.emit('start');
     var tasks = [];
     utils.each(me.browserProfiles, function(profile) {
         // prepare  tasks for a single profile
@@ -81,14 +73,14 @@ Runner.prototype.runTestStrategy = function(cb) {
     var me = this;
     //me.preProcessDrivers();
     me.preProcessReporters();
-    me.emit('start');
+
     me.bq = new BQ(me.browserProfiles);
     var concurrency = me.browserProfiles.length;
     var q = async.queue(function(featureFile, callback) {
         var profile = me.bq.next();
         me.runFeatureFile(featureFile, profile, function(err, session) {
             me.bq.release(session.profile);
-            callback(err, session.id);
+            callback(err, session);
         });
     }, concurrency);
     q.drain = function() {
@@ -107,13 +99,14 @@ Runner.prototype.runFeatureFile = function (featureFile, profile, callback) {
     me.setupListeners(session);
     session.loadFeature(featureFile, function(err) {
         if(err) {
-            logger.debug('[runner] An error has occured while loading feature file ' + featureFile, err);
-            console.error('[runner] An error has occured while loading feature file ' + featureFile);
-            console.error(err.stack);
-            return;
+            logger.debug('[runner] An error has occured while loading feature ' + featureFile, err);
+            console.error('[runner] ', err.message);
+            console.error('[runner] Skipping feature ' + featureFile);
+            console.log();
+            return callback(err, session);
         }
         session.start(function(err) {
-            callback(err, me);
+            callback(err, session);
         });
     });
 
@@ -121,8 +114,11 @@ Runner.prototype.runFeatureFile = function (featureFile, profile, callback) {
 Runner.prototype.postRun = function(cb) {
     var me = this;
     logger.debug('[runner] Done processing all files');
-    me.emit('end');
+    me.emit('end', me);
     me.postProcessReporters(function() {
+        me.state = 'stopped';
+        me.emit('stop', me);
+        
         if(typeof cb === 'function') {
             cb(me.stats);
         }
@@ -131,6 +127,7 @@ Runner.prototype.postRun = function(cb) {
 Runner.prototype.preProcessReporters = function() {
     var me = this,
         reps = [{ name: 'base'}];
+    me.emit('reporter-pre-process', me);
     utils.each(me.options.reporters||[], function(reporter) {
         reporter = utils.isObject(reporter) ? reporter : { name: reporter };
         if(reporter.name !== 'base') {
@@ -147,6 +144,7 @@ Runner.prototype.preProcessReporters = function() {
 
 Runner.prototype.postProcessReporters = function(callback) {
     var me = this, series = [];
+    me.emit('reporter-post-process', me);
     // process the 'base' reporter first
     series.push(function(cb) {
          me.reporters.base.process(me.stats, cb);
@@ -172,7 +170,10 @@ Runner.prototype.abort = function(cb) {
     var me = this;
     logger.debug('[runner] Aborted execution');
     console.log( '\nStopping Mimik...' );
-    me.abortActiveSessions(cb);
+    me.abortActiveSessions(function() {
+        me.state = 'stopped';
+        cb();
+    });
 };
 
 Runner.prototype.abortActiveSessions = function(callback) {

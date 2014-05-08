@@ -50,7 +50,7 @@ Driver.prototype.init = function(options) {
         logger.debug('[selenium driver] client event "command"', e.method, e.uri, e.data);
     });
     this.client.on('result', function(e) {
-        logger.debug('[selenium driver] client event "result"',e.body.status, e.body.sessionId);
+        logger.debug('[selenium driver] client event "result"');
     });
 
 };

@@ -13,21 +13,31 @@ var fs = require('fs'),
     pkg = require('../package.json'),
     program = require('commander'),
     utils = require('../lib/utils'),
-    Yadda = require('yadda');
+    Yadda = require('yadda'),
+    chokidar = require('chokidar'),
+    colors = require('colors');
+
+colors.setTheme({
+    note: 'grey',
+    info: 'white',
+    warn: 'yellow',
+    debug: 'blue',
+    error: 'red'
+});
+
 program
     .version(pkg.version)
     .description(pkg.description);
 
 var cmd = require('../lib/help')(program);
-require('colors');
-
 
 /*
  * GLOBALS
  */
 
 var reruns = [],
-    logger;
+    logger,
+    runner;
 
 /**
  * scan for files at the given `path`.
@@ -184,9 +194,16 @@ function getLogger(config) {
     return logger;
 }
 
-function runTests(targets) {
+function runTests(targets, options) {
     // Process configuration
     var config = {};
+    
+    if(runner && runner.state === 'started') {
+        runner.abort(function() {
+            runTests(targets, options);
+        });
+        return;
+    }
     if(program.config) {
         try {
             config = JSON.parse(fs.readFileSync(program.config));
@@ -226,13 +243,18 @@ function runTests(targets) {
             }
             fs.writeFileSync(rerunFile, output);
         }
-        var exitCode = (stats.failures > 0) ? 1 : 0;
-        process.exit(exitCode);
+
+        runner = null;
+        // don't exit if we're in watch mode
+        if(options && !options.watch) {
+            var exitCode = (stats.failures > 0) ? 1 : 0;
+            process.exit(exitCode);
+        }
     }
 
     var Runner = require('../runner/Runner');
-    this.runner = new Runner(config);
-    this.runner.run(onRunComplete);
+    runner = new Runner(config);
+    runner.run(onRunComplete);
 }
 function generateSteps (file, language) {
     var Yadda = require('yadda'),
@@ -249,10 +271,51 @@ function generateSteps (file, language) {
         console.log(output);
     });
 }
+function watchPaths(targets) {
+
+    targets = targets.length > 0 ? targets : ['.'];
+    var watcher = chokidar.watch(targets, { 
+        ignored: /[\/\\]\./, 
+        persistent: true,
+        ignoreInitial: true
+    });
+    // clear screen
+    process.stdout.write('\u001b[2J');
+    // set cursor position
+    process.stdout.write('\u001b[1;3H');
+    printLogo();
+    console.log('Watching for changes, press', 'Ctrl+C'.note, 'to exit\n');
+    watcher.on('add', function() {
+        console.log('add');
+    });
+    watcher.on('change', function(target) {
+        var date = new Date(),
+            strTime = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+        console.info(('Change detected at ' + strTime + ' in').note, path.basename(target));
+        console.log();
+        runTests(targets, { watch: true });
+    });
+    watcher.on('unlink', function() {
+        console.log('unlink');
+    });
+    watcher.on('error', function() {
+        console.log('error');
+    });
+
+    // var watcher = chokidar.watch(program.args[0], {
+    //     ignored: checkFile,
+    //     persistent: true
+    // });
+
+
+}
 function processCommand(cmd) {
     if(cmd.action === 'run') {
         logger.info('[command] execute "run" mode');
         runTests(cmd.args);
+    } else if(cmd.action === 'watch') {
+        logger.info('[command] execute "watch" mode');
+        watchPaths(cmd.args);
     } else if(cmd.action === 'web') {
         logger.info('[command] execute "web" mode');
     } else if(cmd.action === 'generate') {
@@ -264,22 +327,36 @@ function processCommand(cmd) {
         program.help();
     }
 }
+function printLogo() {
+    console.log(["",
+    "  ███    ███ ██ ███    ███ ██ ██   ██  ",
+    "  ████  ████ ██ ████  ████ ██ ██  ██   ",
+    "  ██ ████ ██ ██ ██ ████ ██ ██ █████    ",
+    "  ██  ██  ██ ██ ██  ██  ██ ██ ██  ██   ",
+    "  ██      ██ ██ ██      ██ ██ ██   ██  ",
+    ""].join('\n'));
+}
+
 /*
  * INITIALIZATION
  */
 
-console.log(["",
-"  ███    ███ ██ ███    ███ ██ ██   ██  ",
-"  ████  ████ ██ ████  ████ ██ ██  ██   ",
-"  ██ ████ ██ ██ ██ ████ ██ ██ █████    ",
-"  ██  ██  ██ ██ ██  ██  ██ ██ ██  ██   ",
-"  ██      ██ ██ ██      ██ ██ ██   ██  ",
-""].join('\n'));
-
+printLogo();
 // parse args
 program.parse(process.argv);
 // Init logger
-logger = getLogger(utils.copyTo({}, program, 'debug,log'));    
+logger = getLogger(utils.copyTo({}, program, 'debug,log'));
+
+// perform graceful shutdown on Ctrl+C
+process.on('SIGINT', function () {
+    if(runner) {
+        runner.abort(function() {
+            process.exit(runner.stats.failures > 0 ? 1 : 0);
+        });
+    } else {
+        process.exit(0);
+    }
+});
 
 processCommand(cmd);
 

@@ -74,7 +74,8 @@
     "chai": "~1.9.1",
     "fs-tools": "~0.2.11",
     "moment": "~2.6.0",
-    "request": "~2.34.0"
+    "request": "~2.34.0",
+    "chokidar": "~0.8.2"
   },
   "devDependencies": {
     "jshint": "~2.5.0",

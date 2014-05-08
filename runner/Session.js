@@ -217,7 +217,12 @@ Session.prototype.loadFeature = function(featureFile, cb) {
         if(err) {
             return cb(err);
         }
-        var feature = me.parseFeature(text.toString());
+        var feature;
+        try {
+            feature = me.parseFeature(text.toString());
+        } catch(err) {
+            return cb(new Error('Could not parse feature. ' + err.message));
+        }
         var stepFile = me.getStepFile(featureFile);
         //var libraries = me.getFeatureRequires(feature);
         if(!stepFile) {
