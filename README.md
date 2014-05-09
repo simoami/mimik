@@ -20,6 +20,7 @@ Usage: mimik [options] [command]
   Commands:
 
     run                    run feature tests found in the [target] path
+    watch                  watch for file changes in the [target] path, then run feature tests
     generate [options]     generate step definitions for a given feature
 
   Options:
