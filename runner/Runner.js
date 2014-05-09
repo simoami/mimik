@@ -100,7 +100,7 @@ Runner.prototype.runFeatureFile = function (featureFile, profile, callback) {
     session.loadFeature(featureFile, function(err) {
         if(err) {
             logger.debug('[runner] An error has occured while loading feature ' + featureFile, err);
-            console.error('[runner] ', err.message);
+            console.error('[runner]', err.message);
             console.error('[runner] Skipping feature ' + featureFile);
             console.log();
             return callback(err, session);
