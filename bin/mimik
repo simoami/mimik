@@ -267,12 +267,12 @@ function generateSteps(file) {
     process.stdout.write('\u001B[f');
     printLogo();
     
-    generator.prompt(function(data) {
-        generator.generateFromFile(file, data.language, data.script, function(err, output) {
+    generator.prompt(file, function(data) {
+        generator.generateFromFile(file, data.language, data.script, data.target, function(err, output) {
             if(err) {
                 logger.debug('[command] Could not generate source.', err.message);
                 console.error('[command] Could not generate source.', err.message);
-            } else {
+            } else if(!data.target) {
                 console.log('Output:\n'.note);
                 console.log(output);
             }
@@ -292,9 +292,13 @@ function watchPaths(targets) {
     console.log('Watching for changes, press', 'Ctrl+C'.note, 'to exit\n');
 
     var fn = function(target) {
+        function f(n) {
+            // Format integers to have a leading zero.
+            return n < 10 ? '0' + n : n;
+        }
         var date = new Date(),
-            strTime = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-        console.info(('Change detected at ' + strTime + ' in').note, path.basename(target));
+            time = f(date.getHours()) + ":" + f(date.getMinutes()) + ":" + f(date.getSeconds());
+        console.info(('Change detected at ' + time + ' in').note, path.basename(target));
         console.log();
         runTests(targets, { watch: true });
     };
