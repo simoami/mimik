@@ -48,10 +48,15 @@ function processFile(file, cb) {
     // Process files written in coffee script
     if(isCoffee) {
         var coffee = require("coffee-script");
-        content = coffee.compile(content, {
-            filename: path.basename(file),
-            bare: true
-        });
+        try {
+            content = coffee.compile(content, {
+                filename: path.basename(file),
+                bare: true
+            });
+        } catch(e) {
+            console.log(e.toString());
+            return cb(e.toString());
+        }
     }
     wrapContent(content, function(newContent) {
         targetModule = new Module(targetPath, module);

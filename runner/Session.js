@@ -86,12 +86,14 @@ Session.prototype.start = function(cb) {
             return;
         }
         // execute features after the browser is launched
-        me.executeFeature(me.feature, function(err, me) {
-            if(!err) {
+        me.executeFeature(me.feature, function(err) {
+            if(err) {
+                me.stop(cb);
+            } else {
                 logger.debug('[session] feature testing started', me.featureFile);
-            }
-            if(typeof cb === 'function') {
-                cb.apply(me, arguments);
+                if(typeof cb === 'function') {
+                    cb.apply(me, arguments);
+                }
             }
         });
     });
