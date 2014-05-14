@@ -62,11 +62,22 @@ function filterFiles(files, params) {
     var inv = !!params.matchInvert,
         featureFiles = [],
         stepFiles = [],
-        sourceFiles = [];
+        sourceFiles = [],
+        ignore = ['node_modules', 'bower_components', '.svn', '.git'];
 
     var English = Yadda.localisation.English,
         parser = new Yadda.parsers.FeatureFileParser(English);
 
+    function ignored(path) {
+        var ignored = false;
+        for(var i = 0, len = ignore.length; i < len; i++) {
+            if(~path.indexOf(ignore[i])) {
+                ignored = true;
+                break;
+            }
+        }
+        return ignored;
+    }
     function hasTags(feature, tags) {
         var status = false,
             annotations = feature.annotations;
@@ -98,7 +109,7 @@ function filterFiles(files, params) {
     
     function isFeature(file) {
         var ext = path.extname(file).substr(1);
-        return ['feature', 'spec', 'specification'].indexOf(ext) > -1;
+        return ~['feature', 'spec', 'specification'].indexOf(ext);
     }
 
     function isRerun(file) {
@@ -117,13 +128,15 @@ function filterFiles(files, params) {
     }
     
     files.forEach(function(file) {
-        // filter by match pattern, tag annotations and reruns
-        if(isFeature(file) && filterByPattern(file, re, inv) && filterByTags(file, params) && isRerun(file)) {
-            featureFiles.push(file);
-        } else if(/(-step|Step)s?\./.test(path.basename(file))){
-            stepFiles.push(file);
-        } else {
-            sourceFiles.push(file);
+        if(!ignored(file)) {
+            // filter by match pattern, tag annotations and reruns
+            if(isFeature(file) && filterByPattern(file, re, inv) && filterByTags(file, params) && isRerun(file)) {
+                featureFiles.push(file);
+            } else if(/(-step|Step)s?\./.test(path.basename(file))){
+                stepFiles.push(file);
+            } else {
+                sourceFiles.push(file);
+            }
         }
     });
     
@@ -367,21 +380,3 @@ process.on('SIGINT', function () {
 });
 
 processCommand(cmd);
-
-/*
-function displayRunSummary() {
-    var browsers = browserProfiles.length,
-		duration = new Date() - startTime,
-		executions = totalTests * browsers;
-    console.log('Completed %d %s on %d %s (%d %s in total)', 
-		totalTests,  
-		pluralize('test', 'tests', totalTests),
-		browsers, 
-		pluralize('browser', 'browsers', browsers),
-		executions,
-		pluralize('execution', 'executions', executions) );
-    console.log('Tests took %s', toSeconds(duration));
-    console.log();
-}
-
-*/
