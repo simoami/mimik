@@ -281,7 +281,7 @@ function generateSteps(file) {
     printLogo();
     
     generator.prompt(file, function(data) {
-        generator.generateFromFile(file, data.language, data.script, data.target, function(err, output) {
+        generator.generateFromFile(file, data.language, data.type, data.target, function(err, output) {
             if(err) {
                 logger.debug('[command] Could not generate source.', err.message);
                 console.error('[command] Could not generate source.', err.message);
