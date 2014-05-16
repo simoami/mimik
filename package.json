@@ -79,7 +79,7 @@
     "colors": "~0.6.2",
     "commander": "~2.2.0",
     "glob": "~3.2.9",
-    "yadda": "~0.10.8",
+    "yadda": "~0.10.10",
     "coffee-script": "~1.7.1",
     "async": "~0.8.0",
     "cli-table": "~0.3.0",
@@ -98,7 +98,7 @@
   },
   "devDependencies": {
     "jshint": "~2.5.0",
-    "express": "~4.1.1",
+    "express": "~4.1.2",
     "istanbul": "~0.2.9",
     "coveralls": "~2.10.0"
   },
