@@ -6,12 +6,12 @@ describe('StepDefinitionGenerator', function() {
     before(function() {
         generator = new StepDefinitionGenerator();
         if (!fs.existsSync('StepDefinitionGenerator.feature')) {
-            fs.writeSync('StepDefinitionGenerator.feature', '');
+            fs.writeFileSync('StepDefinitionGenerator.feature', '');
         }
     });
     
     after(function() {
-        //fs.unlinkSync('StepDefinitionGenerator.feature');
+        fs.unlinkSync('StepDefinitionGenerator.feature');
     });
     
     describe('matchStep()', function() {
