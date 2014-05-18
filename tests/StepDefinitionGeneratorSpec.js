@@ -1,3 +1,6 @@
+/*jshint node:true*/
+/*global describe,before,after,it*/
+'use strict';
 var proxyquire = require('proxyquire').noPreserveCache();
 var expect = require("chai").expect;
 var fs = require('fs');
@@ -5,7 +8,6 @@ var stubs = {};
 var StepDefinitionGenerator = proxyquire("../lib/StepDefinitionGenerator.js", stubs);
 var stream = require("mock-utf8-stream");
 var generator, stdin, stdout, feature, featureContent;
-
 describe('StepDefinitionGenerator', function() {
     before(function() {
         stdin = new stream.MockReadableStream();
@@ -124,20 +126,20 @@ describe('StepDefinitionGenerator', function() {
             });
         });
         it('should fail on an invalid file', function(done) {
-            generator.generateFromFile('xyz.feature', 'English', 'coffeescript', null, function(err, output) {
+            generator.generateFromFile('xyz.feature', 'English', 'coffeescript', null, function(err) {
                 expect(err).to.be.an.instanceof(Error).with.property('message').that.equals('Could not locate the feature file xyz.feature');
-                generator.generateFromFile('', 'English', 'coffeescript', null, function(err, output) {
+                generator.generateFromFile('', 'English', 'coffeescript', null, function(err) {
                     expect(err).to.be.an.instanceof(Error).with.property('message').that.equals('The supplied feature file is invalid');
                     done();
                 });
             });
         });
         it('should generate to an output file', function(done) {
-            generator.generateFromFile('StepDefinitionGenerator.feature', 'English', 'coffeescript', '_temp_output.coffee', function(err, output) {
+            generator.generateFromFile('StepDefinitionGenerator.feature', 'English', 'coffeescript', '_temp_output.coffee', function(err) {
                 expect(fs.existsSync('_temp_output.coffee')).to.be.true;
                 var content = fs.readFileSync('_temp_output.coffee');
                 expect(content.toString()).to.equal('# Given a condition\nGiven /a condition/, (done) ->\n    done()\n\n# When an action is performed\nWhen /an action is performed/, (done) ->\n    done()\n\n# Then an outcome is expected\nThen /an outcome is expected/, (done) ->\n    done()\n\n');
-                fs.unlinkSync('_temp_output.coffee')
+                fs.unlinkSync('_temp_output.coffee');
                 done();
             });
         });
@@ -154,7 +156,7 @@ describe('StepDefinitionGenerator', function() {
         });
     });
 
-    describe('prompt()', function(done) {
+    describe('prompt()', function() {
         it('should prompt the user for options', function(done) {
             generator.prompt('StepDefinitionGenerator.feature', function(res) {
                 expect(res).to.be.an('object');
