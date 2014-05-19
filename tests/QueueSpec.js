@@ -27,22 +27,26 @@ describe('Queue', function() {
                 cb('syncFn3');
             });
             var chain = new Chainable();
-            chain.asyncFn1(function() {
-                chain.asyncFn2(function() {
-                    calls.push('after asyncFn2');
-                });
-            }).asyncFn2(function() {
+            chain
+                .asyncFn1(function() {
+                    chain.asyncFn2(function() {
+                        calls.push('after asyncFn2');
+                    });
+                })
+                .asyncFn2(function() {
                     calls.push('after second asyncFn2');
-                }).syncFn3(function() {
-                expect(calls).to.eql(['asyncFn1', 'asyncFn2', 'after asyncFn2', 'asyncFn2', 'after second asyncFn2', 'syncFn3']);
-                done();
-            });
+                })
+                .syncFn3(function() {
+                    expect(calls).to.eql(['asyncFn1', 'asyncFn2', 'after asyncFn2', 'asyncFn2', 'after second asyncFn2', 'syncFn3']);
+                    done();
+                });
         });
     });
     describe('chainClass()', function() {
-        it('should call chained method in the correct sequence', function(done) {
+        it('should make the entire class chainable and call chained method in the correct sequence', function(done) {
             var calls = [];
             var Chainable = function() {};
+            Chainable.prototype.property1 = 'test';
             Chainable.prototype.asyncFn1 = function(cb) {
                 setTimeout(function() {
                     calls.push('asyncFn1');
@@ -62,28 +66,21 @@ describe('Queue', function() {
             Queue.chainClass(Chainable);
             
             var chain = new Chainable();
-            console.log(chain.asyncFn1.toString());
+            expect(chain.property1).to.equal('test');
             
-            chain.asyncFn1(function() {
-                chain.asyncFn2(function() {
-                    calls.push('after asyncFn2');
-                });
-            }).asyncFn2(function() {
+            chain
+                .asyncFn1(function() {
+                    chain.asyncFn2(function() {
+                        calls.push('after asyncFn2');
+                    });
+                })
+                .asyncFn2(function() {
                     calls.push('after second asyncFn2');
-                }).syncFn3(function() {
-                expect(calls).to.eql(['asyncFn1', 'asyncFn2', 'after asyncFn2', 'asyncFn2', 'after second asyncFn2', 'syncFn3']);
-                done();
-            });
-        });
-    });
-    describe('done()', function() {
-        it('should add', function() {
-
-        });
-    });
-    describe('chain()', function() {
-        it('should add', function() {
-
+                })
+                .syncFn3().call(function() {
+                    expect(calls).to.eql(['asyncFn1', 'asyncFn2', 'after asyncFn2', 'asyncFn2', 'after second asyncFn2', 'syncFn3']);
+                    done();
+                });
         });
     });
 
