@@ -6,9 +6,9 @@
 
 ## Introduction
 
-Mimik is a behavior-driven testing framework and UI automation platform. Similar to [Cucumber](http://cukes.info/), it enables Agile story-writing allowing all stakehohlders to describe how software should behave in plain text.
+Mimik is a behavior-driven testing framework and UI automation platform. Similar to [Cucumber](http://cukes.info/), it enables Agile story-writing allowing all stakeholders to describe how software should behave in natural language.
 
-Mimik focuses on simplicity and brings excitement to test writing. Bevavior is described following the [Guerkin](https://github.com/cucumber/cucumber/wiki/Gherkin) syntax:
+Mimik focuses on simplicity and brings excitement to test writing. Behavior is described following the [Guerkin](https://github.com/cucumber/cucumber/wiki/Gherkin) syntax:
 
 ```
 Feature: Login
@@ -82,13 +82,13 @@ You can access the full documentation [here]().
 ## Command Usage
 
 ```
-Usage: mimik [options] [command]
+  Usage: mimik [options] [command]
 
   Commands:
 
     run                    run feature tests found in the [target] path
     watch                  watch for file changes in the [target] path, then run feature tests
-    generate [options]     generate step definitions for a given feature
+    generate               generate step definition templates for the specified feature file <path>
 
   Options:
 
@@ -106,7 +106,7 @@ Usage: mimik [options] [command]
     --test-strategy <name>      "test" runs different tests in parallel. "browser" runs the same test in mutiple browsers [test]
     --reporters <names>         comma-delimited report <names> to enable. available options: junit,html
     --report-path <path>        path for the generated reports
-    --rerun <path>              path to generate a list of failed features or rerun features from a previously generated file
+    --rerun <path>              path to generate a list of failed features or rerun features from an previously generated file
     --debug                     enable debug logging
     --log <path>                path including file name to create a file log
 ```
