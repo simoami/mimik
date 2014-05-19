@@ -71,7 +71,132 @@ npm install mimik -g
 
 The flag `-g` ensures that the mimik command is accessible globally.
 
-## Quick start
+## Quick Start
+
+Create a folder structure for your test project as follows:
+
+```
+tests
+├─ features
+└─ steps
+```
+
+#### Define your Feature
+
+Features are the primary building blocks in Mimik. Here you describe the feature you want to test. Features will contain a title, an optional description to outline the business benefits and goals. A feature will be followed by one or multiple scenarios. Each scenario will contain a series of given/when/then steps.
+
+create the file `features/login.feature` and add the following content to it.
+```
+Feature: Login
+  In order to access my account on Github
+  As a registered user
+  I need to be able to log in
+
+  Scenario: Successful login
+
+    Given I am a registered user
+    When I go to github.com
+    And I enter my credentials and submit the login form
+    Then I should see a welcome page
+
+```
+
+#### Generate the Step Definitions
+
+Run the following command to generate an empty step definition file template.
+
+```
+cd tests
+mimik generate features/login.feature
+```
+
+An interactive menu will guide you through the process. Select the option to save output to a file when prompted, as follows:
+```
+Feature file: tests/functional/features/todomvc.feature
+Press Ctrl+C to abort
+
+Choose output
+  1. javascript (default)
+  2. coffeescript
+  ›  javascript
+
+Specify the feature file language
+  1. English (default)
+  2. French
+  3. Norwegian
+  4. Polish
+  5. Spanish
+  ›  English
+
+Generate output
+  1. Display output (default)
+  2. Save to a file
+  ›  Save to a file
+
+Specify a path:
+  tests/steps/login-steps.js (default)
+  › Saving to tests/steps/login-steps.js
+
+```
+
+The generated step definition file should look like this:
+```javascript
+// Given I am a registered user
+Given(/I am a registered user/, function(done) {
+    done();
+});
+
+// When I go to github.com
+When(/I go to github.com/, function(done) {
+    done();
+});
+
+// And I enter my credentials and submit the login form
+And(/I enter my credentials and submit the login form/, function(done) {
+    done();
+});
+
+// Then I should see a welcome page
+Then(/I should see a welcome page/, function(done) {
+    done();
+});
+
+```
+We will edit the generated files further down. For now, let's run the feature as is.
+
+#### Run Mimik
+
+Now that the feature is defined and the corresponding step definition file is generated, go ahead and run mimik from the `tests` folder.
+
+```
+mimik run
+```
+
+If all the steps above were executed properly, you will get the following output (output is colored):
+
+```
+ Found 1 feature...
+
+----------------------------------------------------------
+  Feature: Login  #tests/features/login.feature
+  Tested in firefox
+
+    Scenario: Successful login
+       ✓ Given I am a registered user
+       ✓ When I go to github.com
+       ✓ And I enter my credentials and submit the login form
+       ✓ Then I should see a welcome page
+
+  ---------- ----------- ------------- -------- --------- -------- 
+  Features   Scenarios   Total Steps   Passed   Skipped   Failed 
+ ---------- ----------- ------------- -------- --------- --------
+  1          1           4             ✓ 4      0         0      
+                                                                  
+  Completed 1 feature in 1.37s
+
+```
+
+#### Update the Step Defintions 
 
 TBD
 
