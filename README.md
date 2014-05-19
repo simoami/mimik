@@ -26,8 +26,8 @@ Mimik is built on top of some of the best open source projects available:
 
 [Mocha](http://visionmedia.github.io/mocha/): BDD Testing framework.  
 [Yadda](https://github.com/acuminous/yadda): Advanced BDD and Gherkin Given/When/Then  parser.  
-[Chai](): Assertion library.  
-[Selenium](): Browser automation.
+[Chai](http://chaijs.com): Assertion library.  
+[Selenium](http://docs.seleniumhq.org/projects/webdriver/): Webdriver based browser automation.
 
 ## Main Features
 
