@@ -175,8 +175,7 @@ mimik run
 If all the steps above were executed properly, you will get the following output (output is colored):
 
 ```
- Found 1 feature...
-
+ Found 1 feature
 ----------------------------------------------------------
   Feature: Login  #tests/features/login.feature
   Tested in firefox
@@ -189,7 +188,7 @@ If all the steps above were executed properly, you will get the following output
 
   ---------- ----------- ------------- -------- --------- -------- 
   Features   Scenarios   Total Steps   Passed   Skipped   Failed 
- ---------- ----------- ------------- -------- --------- --------
+  ---------- ----------- ------------- -------- --------- --------
   1          1           4             ✓ 4      0         0      
                                                                   
   Completed 1 feature in 1.37s
