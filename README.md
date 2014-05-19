@@ -8,7 +8,7 @@
 
 Mimik is a behavior-driven testing framework and UI automation platform. Similar to [Cucumber](http://cukes.info/), it enables Agile story-writing allowing all stakehohlders to describe how software should behave in plain text.
 
-Behavior is described in plain English. The format follows [Guerkin](https://github.com/cucumber/cucumber/wiki/Gherkin) syntax:
+Mimik focuses on simplicity and brings excitement to test writing. Bevavior is described following the [Guerkin](https://github.com/cucumber/cucumber/wiki/Gherkin) syntax:
 
 ```
 Feature: Login
@@ -28,9 +28,6 @@ Mimik is built on top of some of the best open source projects available:
 [Yadda](https://github.com/acuminous/yadda): Advanced BDD and Gherkin Given/When/Then  parser.  
 [Chai](): Assertion library.  
 [Selenium](): Browser automation.
-
-
-It focuses on simplicity and ease of writing tests.
 
 ## Main Features
 
