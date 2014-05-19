@@ -4,16 +4,83 @@
 [![Coverage Status](https://coveralls.io/repos/simoami/mimik/badge.png)](https://coveralls.io/r/simoami/mimik)
 [![Dependency Status](https://david-dm.org/simoami/mimik.svg)](https://david-dm.org/simoami/mimik)
 
-Mimik is a feature-rich UI automation platform which runs on the browser and Node.js.  It brings BDD style syntax to support Agile story-writing style allowing all stakehohlders to contribute to automation tests. Built on top of some of the best frameworks, it can solve real-world challenges.
+## Introduction
+
+Mimik is a behavior-driven testing framework and UI automation platform. Similar to [Cucumber](http://cukes.info/), it enables Agile story-writing allowing all stakehohlders to describe how software should behave in plain text.
+
+Behavior is described in plain English. The format follows [Guerkin](https://github.com/cucumber/cucumber/wiki/Gherkin) syntax:
+
+```
+Feature: Login
+  In order to access the application
+  As a registered user
+  I need to be able to log in
+
+  Scenario:
+    Given I am a registered user
+    When I enter my credentials and submit the login form
+    Then I should see a welcome page
+```
+
+Mimik is built on top of some of the best open source projects available:
+
+[Mocha](http://visionmedia.github.io/mocha/): BDD Testing framework
+[Yadda](https://github.com/acuminous/yadda): Advanced BDD and Gherkin Given/When/Then  parser.
+[Chai](): Assertion library
+[Selenium](): Browser automation
+
+It focuses on simplicity and ease of writing tests.
+
+## Main Features
+
+- BDD / Cucumber style, Feature based testing
+- supports features written in multiple languages
+- Supports both Javascript and Coffeescript source files.
+- Unit and Functional Testing
+- Generate test code automatically
+- Watch for file changes and run specific tests automatically
+- Support multiple parallel testing strategies
+- Supports Cross-browser testing
+- Run functional tests on local browsers or cloud-based services
+- Amazing HTML5 reports
+- Jira and Testrail integration
+- More: views, junit output, annotation support, filtering by annotations, 
+- Lastly, it's Free!
+
+<!-- View a comprehensive list of all features compared to other testing tools. -->
+
+
+## Content:
+
+[Installation]()
+[Quick start]()
+[Documentation]()
+[Screenshots]()
+[Contributors]()
+
+------------------
 
 ## Installation
+
+[Node.js](http://nodejs.org/) and [NPM](https://www.npmjs.org) are required in order to install Mimik. NPM is packaged with Node.js, so it's typically installed as well. If not, you can still install it separately.
 
 ```
 npm install mimik -g
 ```
 
-## Usage
+The flag `-g` ensures that the mimik command is accessible globally.
 
+
+## Quick start
+
+TBD
+
+## Documentation
+
+You can access the full documentation [here]().
+
+
+## Command Usage
 
 ```
 Usage: mimik [options] [command]
@@ -47,13 +114,12 @@ Usage: mimik [options] [command]
 
 ## Examples
 
-See the [examples](./examples) folder
+See the [examples](./examples) folder.
+
 
 ## Running Tests
 
-```
-npm test
-```
+TBD
 
 ## Maintainer
 
