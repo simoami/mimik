@@ -24,10 +24,11 @@ Feature: Login
 
 Mimik is built on top of some of the best open source projects available:
 
-[Mocha](http://visionmedia.github.io/mocha/): BDD Testing framework
-[Yadda](https://github.com/acuminous/yadda): Advanced BDD and Gherkin Given/When/Then  parser.
-[Chai](): Assertion library
-[Selenium](): Browser automation
+[Mocha](http://visionmedia.github.io/mocha/): BDD Testing framework.  
+[Yadda](https://github.com/acuminous/yadda): Advanced BDD and Gherkin Given/When/Then  parser.  
+[Chai](): Assertion library.  
+[Selenium](): Browser automation.
+
 
 It focuses on simplicity and ease of writing tests.
 
@@ -52,13 +53,16 @@ It focuses on simplicity and ease of writing tests.
 
 ## Content:
 
-[Installation]()
-[Quick start]()
-[Documentation]()
-[Screenshots]()
-[Contributors]()
+[Installation](#installation)  
+[Quick Start](#quickstart)  
+[Documentation](#documentation)  
+[Command Usage](#commandusage)  
+[Examples](#examples)  
+[Contributing](#contributing)  
+[Maintainer](#maintainer)  
+[License](#license)  
 
-------------------
+---
 
 ## Installation
 
@@ -70,7 +74,6 @@ npm install mimik -g
 
 The flag `-g` ensures that the mimik command is accessible globally.
 
-
 ## Quick start
 
 TBD
@@ -78,7 +81,6 @@ TBD
 ## Documentation
 
 You can access the full documentation [here]().
-
 
 ## Command Usage
 
@@ -116,19 +118,13 @@ Usage: mimik [options] [command]
 
 See the [examples](./examples) folder.
 
+## Contributing
 
-## Running Tests
-
-TBD
+See [here](./CONTRIBUTING.md).
 
 ## Maintainer
 
 [Simo Moujami](http://www.linkedin.com/in/simoami)
-
-
-## Contributing
-
-See [here](./CONTRIBUTING.md).
 
 ## License
 
