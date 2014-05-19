@@ -54,9 +54,9 @@ It focuses on simplicity and ease of writing tests.
 ## Content:
 
 [Installation](#installation)  
-[Quick Start](#quickstart)  
+[Quick Start](#quick-start)  
 [Documentation](#documentation)  
-[Command Usage](#commandusage)  
+[Command Usage](#command-usage)  
 [Examples](#examples)  
 [Contributing](#contributing)  
 [Maintainer](#maintainer)  
