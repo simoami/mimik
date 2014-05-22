@@ -1,5 +1,7 @@
 /*jshint node:true*/
+'use strict';
 var webdriverjs = require('webdriverjs'),
+    wd = require('wd'),
     logger = require('winston').loggers.get('mimik');
 
 function Driver(runner) {
@@ -35,8 +37,21 @@ function Driver(runner) {
 Driver.prototype.init = function(options) {
     // wd will default to local firefox if no options are specified
     this.options = options || {};
-    this.client = webdriverjs.remote(options);
+    this.client = wd.promiseChainRemote(options); //wd.remote(options);
     logger.debug('[selenium driver] client initialized with config:', options);
+    this.client.on('status', function(info) {
+        logger.debug('[selenium driver] client event "status"', info);
+    });
+    this.client.on('http', function(meth, path) {
+        logger.debug('[selenium driver] client event "http"', meth, path);
+    });
+    this.client.on('command', function(eventType, command) {
+        logger.debug('[selenium driver] client event "command"', eventType, command);
+    });
+    this.client.on('error', function() {
+        logger.debug('[selenium driver] client event "error"', arguments);
+    });
+/*
     this.client.on('end', function() {
         logger.debug('[selenium driver] client event "end"', arguments);
     });
@@ -46,12 +61,10 @@ Driver.prototype.init = function(options) {
     this.client.on('error', function(e) {
         logger.debug('[selenium driver] client event "error"', e.err);
     });
-    this.client.on('command', function(e) {
-        logger.debug('[selenium driver] client event "command"', e.method, e.uri, e.data);
-    });
     this.client.on('result', function(e) {
         logger.debug('[selenium driver] client event "result"');
     });
+*/
 
 };
 /**
@@ -80,8 +93,8 @@ Driver.prototype.start = function(cb) {
         }
     };
     me.state = 'starting';
-    logger.debug('[selenium driver] browser starting...');   
-    this.client.init(callback);
+    logger.debug('[selenium driver] browser starting...');
+    this.client.init(me.options.desiredCapabilities, callback);
 };
 /**
  * Stop the web browser
@@ -101,7 +114,7 @@ Driver.prototype.stop = function(cb) {
     };
     logger.debug('[selenium driver] browser closing...');
     me.state = 'stopping';
-    me.client.end(callback);
+    me.client.quit(callback);
 };
 /**
  * Return the WD client instance
@@ -110,7 +123,7 @@ Driver.prototype.getClient = function() {
     return this.client;
 };
 Driver.prototype.getScreenshot = function(cb) {
-    this.client.screenshot(function(err, image) {
+    this.client.takeScreenshot(function(err, image) {
         if(err) {
             logger.error('[selenium driver] could not capture a screenshot');
         }
@@ -125,4 +138,22 @@ Driver.prototype.saveScreenshot = function(path, cb) {
         cb(err, path, image);
     });
 };
+Driver.prototype.getBrowserName = function() {
+    return this.options.desiredCapabilities.browserName;
+};
+/* chaining words
+to
+be
+been
+is
+that
+and
+have
+with
+at
+of
+same
+a
+an
+*/
 exports = module.exports = { name: 'webdriver', proto: Driver };

@@ -43,8 +43,8 @@ Session.prototype.init = function () {
     var me = this,
         mocha = new Mocha({
             ui: 'bdd',
-            //reporter: 'base',
-            reporter: 'spec',
+            reporter: 'base',
+            //reporter: 'spec',
             useInlineDiffs: true,
             //asyncOnly: true,
             timeout: me.options.timeout,
@@ -81,7 +81,8 @@ Session.prototype.start = function(cb) {
         me.state = 'started';
         me.emit('start', me);
         me.driverSessionId = sessionId;
-        logger.debug('[session] Started session ' + me.id + ' on ' + me.profile.desiredCapabilities.browserName);    
+        var browserName = me.driver.getBrowserName();
+        logger.debug('[session] Started session ' + me.id + (browserName ? ' on ' + browserName : ''));
         if(me.aborted) {
             return;
         }
@@ -231,6 +232,7 @@ Session.prototype.loadFeature = function(featureFile, cb) {
             err = new Error('No corresponding step definitions were found for feature "' +  path.basename(me.featureFile) + '"');
             return cb(err, feature);
         }
+        feature.file = featureFile;
         me.feature = feature;
         me.stepFile = stepFile;
         cb(err, feature);

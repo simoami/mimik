@@ -107,7 +107,7 @@ function Reporter(runner) {
     runner.on('suite', function(suite) {
         if(!suite._reporterData && !suite.root) {
             var reportData = me.getTopSuite(suite)._reporterData,
-                scenario = reportData.feature.scenarios[reportData.feature.scenarios.length-1];
+                scenario = reportData.feature.scenarios[reportData.scenarios.length];
             // Add scenario
             stats.scenarios.total++;
             reportData.stats.scenarios.total++;

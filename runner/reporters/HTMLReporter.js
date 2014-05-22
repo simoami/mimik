@@ -308,7 +308,7 @@ Reporter.prototype.getScreenshot = function(test) {
             me.screenshots.push({
                 test: test,
                 feature: test.feature,
-                screenshot: image.value
+                screenshot: image
             });
         }
     });

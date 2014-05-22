@@ -30,10 +30,13 @@ function Runner(options) {
 utils.extend(Runner, EventEmitter);
 
 Runner.prototype.run = function (cb) {
-    var me = this;
-    var callback = function() {
-        cb.call(me, arguments);
-    };
+    var me = this,
+        callback = function() {
+            cb.call(me, arguments);
+        };
+    //me.preProcessDrivers();
+    me.preProcessReporters();
+
     me.state = 'started';
     me.emit('start');
     
@@ -46,8 +49,6 @@ Runner.prototype.run = function (cb) {
 };
 Runner.prototype.runBrowserStrategy = function(cb) {
     var me = this;
-    //me.preProcessDrivers();
-    me.preProcessReporters();
     var tasks = [];
     utils.each(me.browserProfiles, function(profile) {
         // prepare  tasks for a single profile
@@ -71,9 +72,6 @@ Runner.prototype.runBrowserStrategy = function(cb) {
 
 Runner.prototype.runTestStrategy = function(cb) {
     var me = this;
-    //me.preProcessDrivers();
-    me.preProcessReporters();
-
     me.bq = new BQ(me.browserProfiles);
     var concurrency = me.browserProfiles.length;
     var q = async.queue(function(featureFile, callback) {
@@ -128,7 +126,7 @@ Runner.prototype.preProcessReporters = function() {
     var me = this,
         reps = [{ name: 'base'}];
     me.emit('reporter-pre-process', me);
-    utils.each(me.options.reporters||[], function(reporter) {
+    utils.each(me.options.reporters||['console'], function(reporter) {
         reporter = utils.isObject(reporter) ? reporter : { name: reporter };
         if(reporter.name !== 'base') {
             reps.push(reporter);
@@ -211,8 +209,8 @@ Runner.prototype.setupListeners = function(source) {
 Runner.prototype.processBrowserProfiles = function (profiles) {
     var me = this;
     me.browserProfiles = [];
-    // default to firefox and webdriver
-    utils.each(profiles||['firefox'], function(profile) {
+    // default to base driver
+    utils.each(profiles||[{ driver: 'base'}], function(profile) {
         if(utils.isString(profile)) {
             profile = {
                 desiredCapabilities: {
