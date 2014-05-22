@@ -82,11 +82,16 @@ Reporter.prototype.displayFeature = function(data) {
     data.suite.suites.forEach(function(scenario) {
         console.log('\n    Scenario:', scenario.title);
         scenario.tests.forEach(function(test) {
-            console.log(
+            var data = [
                 '      ', 
                 (test.state === 'passed' ? tick.green : (test.state === 'failed' ? cross.red : bullet.cyan)) + 
                 test.title.grey
-            );
+            ];
+            // Add duration to the test string if the test is slow.
+            if(test.speed !== 'fast') {
+                data.push(test.speed === 'medium' ? String('('+toSeconds(test.duration)+')').yellow : String('('+toSeconds(test.duration)+')').red);
+            }
+            console.log(data.join(' '));
             if(test.err) {
                 me.displayError(test.err, errorCount++);
             }
