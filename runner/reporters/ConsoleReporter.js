@@ -117,7 +117,7 @@ Reporter.prototype.displayError = function(error, count) {
           .replace(/^/gm, '       ');
 
         console.error(tpl, msg, stack);
-}
+};
 Reporter.prototype.process = function(stats, cb) {
     //var browsers = browserProfiles.length,
 	var total = stats.results.length; // * browsers;
