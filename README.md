@@ -4,25 +4,215 @@
 [![Coverage Status](https://coveralls.io/repos/simoami/mimik/badge.png)](https://coveralls.io/r/simoami/mimik)
 [![Dependency Status](https://david-dm.org/simoami/mimik.svg)](https://david-dm.org/simoami/mimik)
 
-Mimik is a feature-rich UI automation platform which runs on the browser and Node.js.  It brings BDD style syntax to support Agile story-writing style allowing all stakehohlders to contribute to automation tests. Built on top of some of the best frameworks, it can solve real-world challenges.
+## Introduction
+
+Mimik is a behavior-driven testing framework and UI automation platform. Similar to [Cucumber](http://cukes.info/), it enables Agile story-writing allowing all stakeholders to describe how software should behave in natural language.
+
+Mimik focuses on simplicity and brings excitement to test writing. Behavior is described following the [Guerkin](https://github.com/cucumber/cucumber/wiki/Gherkin) syntax:
+
+```
+Feature: Login
+  In order to access the application
+  As a registered user
+  I need to be able to log in
+
+  Scenario: Successful login
+    Given I am a registered user
+    When I enter my credentials and submit the login form
+    Then I should see a welcome page
+```
+
+Mimik is built on top of some of the best open source projects available:
+
+[Mocha](http://visionmedia.github.io/mocha/): BDD Testing framework.  
+[Yadda](https://github.com/acuminous/yadda): Advanced BDD and Gherkin Given/When/Then  parser.  
+[Chai](http://chaijs.com): Assertion library.  
+[Selenium](http://docs.seleniumhq.org/projects/webdriver/): Webdriver based browser automation.
+
+## Main Features
+
+- BDD / Cucumber style, Feature based testing
+- supports features written in multiple languages
+- Supports both Javascript and Coffeescript source files.
+- Unit and Functional Testing
+- Generate test code automatically
+- Watch for file changes and run specific tests automatically
+- Support multiple parallel testing strategies
+- Supports Cross-browser testing
+- Run functional tests on local browsers or cloud-based services
+- Amazing HTML5 reports
+- Jira and Testrail integration
+- More: views, junit output, annotation support, filtering by annotations, 
+- Lastly, it's Free!
+
+<!-- View a comprehensive list of all features compared to other testing tools. -->
+
+
+## Content:
+
+[Installation](#installation)  
+[Quick Start](#quick-start)  
+[Documentation](#documentation)  
+[Command Usage](#command-usage)  
+[Examples](#examples)  
+[Contributing](#contributing)  
+[Maintainer](#maintainer)  
+[License](#license)  
+
+---
 
 ## Installation
+
+[Node.js](http://nodejs.org/) and [NPM](https://www.npmjs.org) are required in order to install Mimik. NPM is packaged with Node.js, so it's typically installed as well. If not, you can still install it separately.
 
 ```
 npm install mimik -g
 ```
 
-## Usage
+The flag `-g` ensures that the mimik command is accessible globally.
 
+## Quick Start
+
+Create a folder structure for your test project as follows:
 
 ```
-Usage: mimik [options] [command]
+tests
+├─ features
+└─ steps
+```
+
+#### Define your Feature
+
+Features are the primary building blocks in Mimik. Here you describe the feature you want to test. Features will contain a title, an optional description to outline the business benefits and goals. A feature will be followed by one or multiple scenarios. Each scenario will contain a series of given/when/then steps.
+
+create the file `features/login.feature` and add the following content to it.
+```
+Feature: Login
+  In order to access my account on Github
+  As a registered user
+  I need to be able to log in
+
+  Scenario: Successful login
+
+    Given I am a registered user
+    When I go to github.com
+    And I enter my credentials and submit the login form
+    Then I should see a welcome page
+
+```
+
+#### Generate the Step Definitions
+
+Run the following command to generate an empty step definition file template.
+
+```
+cd tests
+mimik generate features/login.feature
+```
+
+An interactive menu will guide you through the process. Select the option to save output to a file when prompted, as follows:
+```
+Feature file: tests/functional/features/todomvc.feature
+Press Ctrl+C to abort
+
+Choose output
+  1. javascript (default)
+  2. coffeescript
+  ›  javascript
+
+Specify the feature file language
+  1. English (default)
+  2. French
+  3. Norwegian
+  4. Polish
+  5. Spanish
+  ›  English
+
+Generate output
+  1. Display output (default)
+  2. Save to a file
+  ›  Save to a file
+
+Specify a path:
+  tests/steps/login-steps.js (default)
+  › Saving to tests/steps/login-steps.js
+
+```
+
+The generated step definition file should look like this:
+```javascript
+// Given I am a registered user
+Given(/I am a registered user/, function(done) {
+    done();
+});
+
+// When I go to github.com
+When(/I go to github.com/, function(done) {
+    done();
+});
+
+// And I enter my credentials and submit the login form
+And(/I enter my credentials and submit the login form/, function(done) {
+    done();
+});
+
+// Then I should see a welcome page
+Then(/I should see a welcome page/, function(done) {
+    done();
+});
+
+```
+We will edit the generated files further down. For now, let's run the feature as is.
+
+#### Run Mimik
+
+Now that the feature is defined and the corresponding step definition file is generated, go ahead and run mimik from the `tests` folder.
+
+```
+mimik run
+```
+
+If all the steps above were executed properly, you will get the following output (output is colored):
+
+```
+ Found 1 feature
+----------------------------------------------------------
+  Feature: Login  #tests/features/login.feature
+  Tested in firefox
+
+    Scenario: Successful login
+       ✓ Given I am a registered user
+       ✓ When I go to github.com
+       ✓ And I enter my credentials and submit the login form
+       ✓ Then I should see a welcome page
+
+  ---------- ----------- ------------- -------- --------- -------- 
+  Features   Scenarios   Total Steps   Passed   Skipped   Failed 
+  ---------- ----------- ------------- -------- --------- --------
+  1          1           4             ✓ 4      0         0      
+                                                                  
+  Completed 1 feature in 1.37s
+
+```
+
+#### Update the Step Defintions 
+
+TBD
+
+## Documentation
+
+You can access the full documentation [here]().
+
+## Command Usage
+
+```
+  Usage: mimik [options] [command]
 
   Commands:
 
     run                    run feature tests found in the [target] path
     watch                  watch for file changes in the [target] path, then run feature tests
-    generate [options]     generate step definitions for a given feature
+    generate               generate step definition templates for the specified feature file <path>
 
   Options:
 
@@ -40,29 +230,22 @@ Usage: mimik [options] [command]
     --test-strategy <name>      "test" runs different tests in parallel. "browser" runs the same test in mutiple browsers [test]
     --reporters <names>         comma-delimited report <names> to enable. available options: junit,html
     --report-path <path>        path for the generated reports
-    --rerun <path>              path to generate a list of failed features or rerun features from a previously generated file
+    --rerun <path>              path to generate a list of failed features or rerun features from an previously generated file
     --debug                     enable debug logging
     --log <path>                path including file name to create a file log
 ```
 
 ## Examples
 
-See the [examples](./examples) folder
-
-## Running Tests
-
-```
-npm test
-```
-
-## Maintainer
-
-[Simo Moujami](http://www.linkedin.com/in/simoami)
-
+See the [examples](./examples) folder.
 
 ## Contributing
 
 See [here](./CONTRIBUTING.md).
+
+## Maintainer
+
+[Simo Moujami](http://www.linkedin.com/in/simoami)
 
 ## License
 
