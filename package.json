@@ -78,7 +78,7 @@
   "dependencies": {
     "colors": "~0.6.2",
     "commander": "~2.2.0",
-    "glob": "~3.2.9",
+    "glob": "~3.2.11",
     "yadda": "~0.10.12",
     "coffee-script": "~1.7.1",
     "async": "~0.8.0",
