@@ -87,8 +87,8 @@ Reporter.prototype.displayFeature = function(data) {
                 (test.state === 'passed' ? tick.green : (test.state === 'failed' ? cross.red : bullet.cyan)) + 
                 test.title.grey
             ];
-            // Add duration to the test string if the test is slow.
-            if(test.speed !== 'fast') {
+            // Add duration to the test string if the test passed and is slow.
+            if(test.state === 'passed' && test.speed !== 'fast') {
                 data.push(test.speed === 'medium' ? String('('+toSeconds(test.duration)+')').yellow : String('('+toSeconds(test.duration)+')').red);
             }
             console.log(data.join(' '));
