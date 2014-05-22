@@ -55,7 +55,6 @@ function Reporter(runner, config) {
 
     runner.on('start', function() {
         var total = me.options.featureFiles.length;
-        console.log();
         if(total > 0) {
             console.log(' Found %d %s', total, pluralize('feature', 'features', total));
         } else {
@@ -72,18 +71,18 @@ function Reporter(runner, config) {
 Reporter.prototype.displayFeature = function(data) {
     var me = this,
         errorCount = 0,
-        feature = '  Feature: ' + data.feature.title + ('  # ' + data.feature.file).grey;
-    console.log(getSeparator(feature.length).grey);
+        feature = ' Feature: ' + data.feature.title + ('  # ' + data.feature.file).grey;
+    console.log(' ' + getSeparator(feature.length).grey);
     console.log(feature);
     var browserName = data.driver.getBrowserName();
     if(browserName) {
-        console.log("  Tested in %s\n".grey, browserName);        
+        console.log(" Tested in %s\n".grey, browserName);
     }
     data.suite.suites.forEach(function(scenario) {
-        console.log('\n    Scenario:', scenario.title);
+        console.log('\n   Scenario:', scenario.title);
         scenario.tests.forEach(function(test) {
             var data = [
-                '      ', 
+                '    ', 
                 (test.state === 'passed' ? tick.green : (test.state === 'failed' ? cross.red : bullet.cyan)) + 
                 test.title.grey
             ];
