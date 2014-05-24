@@ -226,7 +226,7 @@ You can access the full documentation [here]().
     -E, --exclude-tags <names>  exclude feature tests  annotated with one of the comma-delimited tag <names>
     -t, --timeout <ms>          set per-test timeout in milliseconds [10000]
     -s, --slow <ms>             "slow" test threshold in milliseconds [5000]
-    -n, --no-bail               continue running tests even on failure
+    -f, --failfast              stop running tests on the first encoutered failure or timeout
     --test-strategy <name>      "test" runs different tests in parallel. "browser" runs the same test in mutiple browsers [test]
     --reporters <names>         comma-delimited report <names> to enable. available options: junit,html
     --report-path <path>        path for the generated reports

@@ -48,7 +48,7 @@ Session.prototype.init = function () {
             useInlineDiffs: true,
             //asyncOnly: true,
             timeout: me.options.timeout,
-            bail: me.options.bail,
+            bail: me.options.failfast,
             slow: me.options.slow
         });
     me.mocha = mocha;
