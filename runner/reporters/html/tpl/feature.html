@@ -93,7 +93,7 @@
                                 <span class="code-collapsible-stack-icon fa fa-chevron-circle-right"></span> 
                                 <a href="#">{{!step.failure.toString()}}</a>
                             </div>
-                            <div class="code-error-stack">{{!step.failure.stack}}</div>
+                            <div class="code-error-stack">{{!it.fn.formatError(step.failure)}}</div>
                         </div>
                     {{?}}
                     

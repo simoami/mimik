@@ -151,7 +151,8 @@ Reporter.prototype.createFeaturePages = function(dir, stats, cb) {
             feature: featureReport,
             fn: {
                 duration: me.getDuration,
-                date: moment
+                date: moment,
+                formatError: me.formatError
             }
         });
         me.writeTemplate(path.join(dir, featureReport.htmlFile), output, function(err) {
@@ -319,6 +320,12 @@ Reporter.prototype.getTopSuite = function(suite) {
         parent = parent.parent;
     }
     return parent ? parent.suites[0] : null;
+};
+Reporter.prototype.formatError = function(error) {
+    var stack = error.stack || error.message || '',
+        index = stack.indexOf('\n') + 1;
+    stack = utils.filterStacktrace(stack, process.cwd()).substr(index);
+    return stack;
 };
 
 exports = module.exports = { name: 'html', proto: Reporter };

@@ -108,8 +108,7 @@ Reporter.prototype.displayError = function(error, count) {
             index = stack.indexOf(message) + message.length,
             msg = stack.slice(0, index),
             actual = error.actual,
-            expected = error.expected,
-            escape = true;
+            expected = error.expected;
 
         // uncaught
         if (error.uncaught) {
@@ -117,12 +116,15 @@ Reporter.prototype.displayError = function(error, count) {
         }
 
         // indent stack trace without msg
-        stack = stack.slice(index ? index + 1 : index)
-          .replace(/^/gm, '       ');
+        stack = stack.slice(index ? index + 1 : index).replace(/^/gm, '       ');
+        
+        if(process.env.NODE_ENV !== "development") {
+            stack = utils.filterStacktrace(stack, process.cwd());
+        }
 
         console.error(tpl, msg, stack);
 };
-Reporter.prototype.process = function(stats, cb) {
+Reporter.prototype.process = function(stats, target, cb) {
     //var browsers = browserProfiles.length,
 	var total = stats.results.length; // * browsers;
     // instantiate
