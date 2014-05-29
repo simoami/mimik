@@ -203,7 +203,7 @@ function getLogger(config) {
 
     if (config.debug) {
         logger.transports.console.level = 'debug';
-        logger.debug('[command] debug logging is ON');
+        logger.debug('[mimik] debug logging is ON');
     }
     return logger;
 }
