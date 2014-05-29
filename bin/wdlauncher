@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /*jshint node:true*/
 var program = require('commander'),
     Manager = require('../lib/WDManager'),
