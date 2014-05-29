@@ -17,7 +17,11 @@ var Session = function(config) {
     var me = this;
     me.id = me.getId();
     var Driver = DriverFactory.get(config.profile.driver);
-    me.driver = new Driver(me, config.options);
+    me.driver = new Driver({
+        session: me,
+        options: config.options,
+        profile: config.profile
+    });
     me.featureFile = config.featureFile;
     me.profile = config.profile;
     me.testRunner = null;
@@ -58,7 +62,6 @@ Session.prototype.init = function () {
     Yadda.plugins.mocha.AsyncStepLevelPlugin.init({
         container: me.context
     });
-    me.driver.init(me.profile);
 };
 
 Session.prototype.start = function(cb) {
