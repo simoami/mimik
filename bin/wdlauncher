@@ -62,22 +62,8 @@ function getLogger(config) {
 }
 
 function start(cb) {
-    manager.checkStatus(function(err, status) {
-        if(err) {
-            return console.error(err.stack);
-        }
-        if(!status.success) {
-            install(start.bind(null, cb));
-        } else {
-            manager.start(cb);
-        }
-    });
+    manager.start(cb);
 }
-
-function stop(cb) {
-    manager.stop(cb);
-}
-
 
 function status(cb) {
     manager.status(cb);
@@ -96,18 +82,10 @@ function install(cb) {
 function init() {
     program
         .command('start')
-        .description('start selenium server')
+        .description('start the selenium standalone server')
         .action(function(){
             var args = Array.prototype.slice.call(arguments, 0, -1);
             cmd.action = 'start';
-            cmd.args = args;
-        });
-    program
-        .command('stop')
-        .description('stop selenium server')
-        .action(function(){
-            var args = Array.prototype.slice.call(arguments, 0, -1);
-            cmd.action = 'stop';
             cmd.args = args;
         });
     program
@@ -130,7 +108,7 @@ function init() {
         .usage('[command]')
         .option('--output <path>', 'path to the location of the binaries', DOWNLOAD_DIR)
         .option('-p,--port <num>', 'optional port for the selenium standalone server')
-        .option('--auto-install <num>', 'auto install missing binaries before starting the selenium server', false)
+        .option('--auto-install', 'auto install missing binaries before starting the selenium server', false)
         .option('--overwrite', 'force download existing binaries', false)
         .option('--debug', "enable debug logging")
         .option('--log <path>', "path including file name to create a file log")
@@ -149,13 +127,6 @@ function init() {
     
     logger = getLogger(utils.copyTo({}, program, 'debug,log'));
 
-    // perform graceful shutdown on Ctrl+C
-    process.on('SIGINT', function () {
-        stop(function() {
-            process.exit(0);
-        });
-    });
-
     processCommand(cmd);
 }
 
@@ -166,34 +137,27 @@ function processCommand(cmd) {
     console.log('');
     if(cmd.action === 'start') {
         start(function(err) {
-            console.log('');
             if(err) {
-                console.error(err.stack);
+                console.error(err.message);
+                process.exit(1);
             }
-            process.exit(err ? 1: 0);
+            console.log('');
+            process.stdin.resume();
         });
     } else if(cmd.action === 'status') {
         status(function(err) {
-            console.log('');
             if(err) {
                 console.error(err.stack);
             }
-            process.exit(err ? 1: 0);
-        });
-    } else if(cmd.action === 'stop') {
-        stop(function(err) {
             console.log('');
-            if(err) {
-                console.error(err.stack);
-            }
             process.exit(err ? 1: 0);
         });
     } else if(cmd.action === 'install') {
         install(function(err) {
-            console.log('');
             if(err) {
                 console.error(err.stack);
             }
+            console.log('');
             process.exit(err ? 1: 0);
         });
     } else {
@@ -201,6 +165,11 @@ function processCommand(cmd) {
         console.log('  ---------------------');
         program.help();
     }
+    
+    // perform graceful shutdown on Ctrl+C
+    process.on('SIGINT', function () {
+        manager.stop();
+    });
 }
 
 init();
