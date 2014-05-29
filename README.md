@@ -42,6 +42,7 @@ Mimik is built on top of some of the best open source projects available:
 - Run functional tests on local browsers or cloud-based services
 - Amazing HTML5 reports
 - Jira and Testrail integration
+- Install and run selenium drivers automatically.
 - More: views, junit output, annotation support, filtering by annotations, 
 - Lastly, it's Free!
 
@@ -205,6 +206,7 @@ You can access the full documentation [here]().
 
 ## Command Usage
 
+### The Mimik command
 ```
   Usage: mimik [options] [command]
 
@@ -233,6 +235,27 @@ You can access the full documentation [here]().
     --rerun <path>              path to generate a list of failed features or rerun features from an previously generated file
     --debug                     enable debug logging
     --log <path>                path including file name to create a file log
+```
+
+### The Selenium Launcher command
+```
+Usage: wdlauncher [command]
+
+  Commands:
+
+    start                  start the selenium standalone server
+    install                install or update missing selenium driver binaries
+    status                 display the current available driver binaries
+
+  Options:
+
+    -h, --help       output usage information
+    --output <path>  path to the location of the binaries
+    -p,--port <num>  optional port for the selenium standalone server
+    --auto-install   auto install missing binaries before starting the selenium server
+    --overwrite      force download existing binaries
+    --debug          enable debug logging
+    --log <path>     path including file name to create a file log
 ```
 
 ## Examples
