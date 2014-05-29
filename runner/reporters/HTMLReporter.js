@@ -17,7 +17,7 @@ function Reporter(runner) {
     me.options = runner.options;
     me.screenshots = [];
     runner.on('fail', function(test) {
-       me.getScreenshot(test);
+        me.getScreenshot(test);
     });
 }
 Reporter.prototype.process = function(stats, target, callback) {
@@ -303,16 +303,19 @@ Reporter.prototype.getTagStats = function(stats) {
 };
 Reporter.prototype.getScreenshot = function(test) { 
     var me = this,
-        reporterData = me.getTopSuite(test.parent)._reporterData;
-    reporterData.driver.getScreenshot(function(err, image) {
-        if(!err) {
-            me.screenshots.push({
-                test: test,
-                feature: test.feature,
-                screenshot: image
-            });
-        }
-    });
+        reporterData = me.getTopSuite(test.parent)._reporterData,
+        driver = reporterData.driver;
+    if(driver.supports('screenshot')) {
+        driver.getScreenshot(function(err, image) {
+            if(!err) {
+                me.screenshots.push({
+                    test: test,
+                    feature: test.feature,
+                    screenshot: image
+                });
+            }
+        });
+    }
 };
 Reporter.prototype.getTopSuite = function(suite) {
     var parent = suite;
