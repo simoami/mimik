@@ -20,7 +20,7 @@
  * @TestRailReporter=addResultForCase(run_id,case_id). Example: @TestRailReporter=addResultForCase(12,34)
  * See http://docs.gurock.com/testrail-api2/reference-results for details
  */
-
+'use strict';
 var url = require('url'),
     async = require('async'),
     utils = require('../../lib/utils'),
@@ -35,7 +35,18 @@ function Reporter(runner, config) {
     me.runner = runner;
     me.options = runner.options;
     me.config = config;
+    me.validateConfig(config);
 }
+Reporter.prototype.validateConfig = function(config) {
+    var valid = true;
+    ['host', 'username', 'password'].forEach(function(param) {
+        if(!config[param]) {
+            console.error('TestRailReporter requires "' + param + '" as a parameter.');
+            valid = false;
+        }
+    });
+    return valid;
+};
 Reporter.prototype.process = function(stats, target, callback) {
     var me = this;
     logger.profile('[testrail reporter] update results');
@@ -105,13 +116,15 @@ Reporter.prototype.getFeatureData = function (report) {
             retest: 4,
             failed: 5
         },
-        comment = ['# Mimik Feature Results #'];
+        comment = ['# Mimik Feature Results #'],
+        browserName = report.driver.getBrowserName();
 
     comment.push('Feature: ' + report.feature.title);
     comment.push('File: ' + report.feature.file);
     comment.push('Duration: ' + me.getDuration(report.stats.duration));
-    comment.push('Agent: ' + me.getAgent(report.profile));
-
+    if(browserName) {
+        comment.push('Agent: ' + browserName);
+    }
     comment.push('\nScenarios: ' + report.scenarios.length);
     comment.push('Tests: ' + report.stats.tests);
     comment.push('Passed: ' + report.stats.passes);
@@ -136,14 +149,16 @@ Reporter.prototype.getScenarioData = function (scenario) {
         },
         report = me.getTopSuite(scenario.suite)._reporterData,
         feature = report.feature,
-        comment = ['# Mimik Scenario Results #'];
+        comment = ['# Mimik Scenario Results #'],
+        browserName = report.driver.getBrowserName();
 
     comment.push('Scenario: ' + scenario.title);
     comment.push('Feature: ' + feature.title);
     comment.push('File: ' + feature.file);
     comment.push('Duration: ' + me.getDuration(scenario.stats.duration));
-    comment.push('Agent: ' + me.getAgent(report.profile));
-
+    if(browserName) {
+        comment.push('Agent: ' + browserName);
+    }
     comment.push('\nTests: ' + scenario.stats.tests);
     comment.push('Passed: ' + scenario.stats.passes);
     comment.push('Pending: ' + scenario.stats.pending);
@@ -219,9 +234,6 @@ Reporter.prototype.getTopSuite = function(suite) {
         parent = parent.parent;
     }
     return parent ? parent.suites[0] : null;
-};
-Reporter.prototype.getAgent = function(profile) {
-    return profile.desiredCapabilities.browserName;
 };
 
 exports = module.exports = { name: 'testrail', proto: Reporter };
