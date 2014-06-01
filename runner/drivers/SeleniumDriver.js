@@ -54,8 +54,8 @@ var Driver = BaseDriver.extend({
             if(err) {
                 me.state = 'stopped';
                 if(typeof cb === 'function') {
-                    logger.debug('[selenium driver] could not start browser ' + err.orgStatusMessage, err);
-                    console.error('[selenium driver] ' + err.orgStatusMessage);
+                    logger.debug('[selenium driver] could not start browser ' + err.message, err);
+                    console.error('[selenium driver] ' + err.message);
                 }
             } else {
                 me.state = 'started';
