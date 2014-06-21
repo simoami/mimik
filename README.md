@@ -8,7 +8,7 @@
 
 Mimik is a behavior-driven testing framework and UI automation platform. Similar to [Cucumber](http://cukes.info/), it enables Agile story-writing allowing all stakeholders to describe how software should behave in natural language.
 
-Mimik focuses on simplicity and brings excitement to test writing. Behavior is described following the [Guerkin](https://github.com/cucumber/cucumber/wiki/Gherkin) syntax:
+Mimik focuses on simplicity and brings excitement to test writing. Tests follow a simple text structure to describe domain-specific behavior. This text structure is known as [Guerkin](https://github.com/cucumber/cucumber/wiki/Gherkin):
 
 ```
 Feature: Login
@@ -70,7 +70,7 @@ Mimik is built on top of some of the best open source projects available:
 npm install mimik -g
 ```
 
-The flag `-g` ensures that the mimik command is accessible globally.
+The flag `-g` ensures that the mimik command is installed and accessible globally.
 
 ## Quick Start
 
@@ -81,6 +81,7 @@ tests
 ├─ features
 └─ steps
 ```
+**Note:** This structure is generally recommended, but not required. 
 
 #### Define your Feature
 
