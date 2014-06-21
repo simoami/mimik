@@ -1,6 +1,6 @@
 {
   "name": "mimik",
-  "description": "UI Automation made easy!",
+  "description": "Write end-to-end automation tests in natural language",
   "version": "0.8.5",
   "homepage": "https://github.com/simoami/mimik",
   "author": "Simo Moujami <simo@webinventinc.com>",
