@@ -1,7 +1,7 @@
 {
   "name": "mimik",
   "description": "Write end-to-end automation tests in natural language",
-  "version": "0.8.6",
+  "version": "0.8.7",
   "homepage": "https://github.com/simoami/mimik",
   "author": "Simo Moujami <simo@webinventinc.com>",
   "main": "./bin/mimik",
