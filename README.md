@@ -1,7 +1,7 @@
 ![Mimik](https://cloud.githubusercontent.com/assets/2038264/2922406/428777b0-d701-11e3-8ef1-a11834e93fa5.png)
 
 [![Build Status](https://travis-ci.org/simoami/mimik.svg?branch=master)](https://travis-ci.org/simoami/mimik)
-[![Coverage Status](https://coveralls.io/repos/simoami/mimik/badge.png)](https://coveralls.io/r/simoami/mimik)
+[![Coverage Status](https://img.shields.io/coveralls/simoami/mimik.svg)](https://coveralls.io/r/simoami/mimik?branch=master)
 [![Dependency Status](https://david-dm.org/simoami/mimik.svg)](https://david-dm.org/simoami/mimik)
 
 ## Introduction
