@@ -6,6 +6,7 @@
   "author": "Simo Moujami <simo@webinventinc.com>",
   "main": "./bin/mimik",
   "scripts": {
+    "start": "node bin/mimik",
     "web": "NODE_ENV=development node app/index.js",
     "test": "node_modules/.bin/_mocha --recursivex --ui bdd --reporter spec tests/*",
     "coverage": "node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- --reporter spec --recursive tests/**/*Spec.js",

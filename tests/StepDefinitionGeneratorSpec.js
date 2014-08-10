@@ -148,11 +148,13 @@ describe('StepDefinitionGenerator', function() {
     describe('getMatchingStepFileName()', function() {
         it('should generate a step file name for a given feature file', function() {
             var stepFile1 = generator.getMatchingStepFileName('StepDefinitionGenerator.feature');
-            var stepFile2 = generator.getMatchingStepFileName('StepDefinitionGenerator.feature', 'javascript', 'Steps', true);
-            var stepFile3 = generator.getMatchingStepFileName('StepDefinitionGenerator.feature', 'coffeescript');
-            expect(stepFile1).to.equal('../steps/StepDefinitionGenerator-steps.js');
-            expect(stepFile2).to.equal('../steps/StepDefinitionGeneratorSteps.js');
-            expect(stepFile3).to.equal('../steps/StepDefinitionGenerator-steps.coffee');
+            var stepFile2 = generator.getMatchingStepFileName('step-definition-generator.feature');
+            var stepFile3 = generator.getMatchingStepFileName('StepDefinitionGenerator.feature', 'javascript', 'Steps', true);
+            var stepFile4 = generator.getMatchingStepFileName('StepDefinitionGenerator.feature', 'coffeescript');
+            expect(stepFile1).to.equal('../steps/StepDefinitionGeneratorSteps.js');
+            expect(stepFile2).to.equal('../steps/step-definition-generator-steps.js');
+            expect(stepFile3).to.equal('../steps/StepDefinitionGeneratorSteps.js');
+            expect(stepFile4).to.equal('../steps/StepDefinitionGeneratorSteps.coffee');
         });
     });
 
@@ -171,13 +173,28 @@ describe('StepDefinitionGenerator', function() {
             stdin.write(''); // take 'English' as default language
             stdin.write(''); // take 'Display' output as default output
         });
-        it('should generate a file when prompted', function(done) {
+        it('should generate a camel-cased file when prompted', function(done) {
             generator.prompt('StepDefinitionGenerator.feature', function(res) {
                 expect(res).to.be.an('object');
                 expect(res).to.eql({
                     language: 'English',
                     type: 'coffeescript',
-                    target: '../steps/StepDefinitionGenerator-steps.coffee'
+                    target: '../steps/StepDefinitionGeneratorSteps.coffee'
+                });
+                done();
+            });
+            stdin.write('2'); // take 'coffeescript' as default script type
+            stdin.write('1'); // take 'English' as default language
+            stdin.write('2'); // select 'File' as output
+            stdin.write(''); // take 'default' path
+        });
+        it('should generate a non camel-cased file when prompted', function(done) {
+            generator.prompt('step-definition-generator.feature', function(res) {
+                expect(res).to.be.an('object');
+                expect(res).to.eql({
+                    language: 'English',
+                    type: 'coffeescript',
+                    target: '../steps/step-definition-generator-steps.coffee'
                 });
                 done();
             });
