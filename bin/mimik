@@ -17,6 +17,10 @@ var fs = require('fs'),
     chokidar = require('chokidar'),
     colors = require('colors');
 
+var stdin = process.stdin,
+    stdout = process.stdout,
+    prompt = '\u203A';
+
 colors.setTheme({
     note: 'grey',
     info: 'white',
@@ -279,20 +283,54 @@ function generateSteps(file) {
     process.stdout.write('\u001B[f');
     printLogo();
     
-    generator.prompt(file, function(data) {
-        generator.generateFromFile(file, data.language, data.type, data.target, function(err, output) {
-            if(err) {
-                logger.debug('[command] Could not generate source.', err.message);
-                console.error('[command] Could not generate source.', err.message);
-            } else if(!data.target) {
-                console.log('Output:\n'.note);
-                console.log(output);
+    fs.exists(file, function(exists) {
+        if(!exists) {
+            logger.debug('[command] Could not locate the file "' + file + '"');
+            return console.error('[command] Could not locate the file "' + file + '"');
+        }
+        generator.prompt(file, function(data) {
+            // display output only. no saving of output to file
+            if(!data.target) {
+                return doGenerateSteps(generator, file, data);
             }
-            process.exit();
+            // check if target file exists and get confirmation to overwrite.
+            fs.exists(file, function(exists) {
+                if(!exists) {
+                    // target file doesn't exist. proceed to save.
+                    return doGenerateSteps(generator, file, data);
+                }
+                utils.question('The target file "' + file + '" already exists. Do you want to replace it?', {
+                    stdin: stdin,
+                    stdout: stdout,
+                    prompt: prompt
+                }, function(answer) {
+                    process.stdout.write('\u001B[1A  ' + prompt + ' \u001B[K');
+                    if(~['y', 'yes'].indexOf(answer.toLowerCase())) {
+                        console.log('yes'.success + '\n');
+                        // user wants to overwrite existing file. Let's proceed
+                        return doGenerateSteps(generator, file, data);
+                    }
+                    console.log('no'.success + '\n\nok, operation aborted.\n');
+                    process.exit();
+                });
+            });
         });
     });
-
 }
+
+function doGenerateSteps(generator, file, data) {
+    generator.generateFromFile(file, data.language, data.type, data.target, function(err, output) {
+        if(err) {
+            logger.debug('[command] Could not generate step definitions.', err.message);
+            console.error('[command] Could not generate step definitions.', err.message);
+        } else if(!data.target) {
+            console.log('Output:\n'.note);
+            console.log(output);
+        }
+        process.exit();
+    });
+}
+
 
 function watchPaths(targets) {
 
