@@ -1,9 +1,13 @@
-# Logs & reports
+# Temp, logs & reports
 logs
 *.log
 *.dat
 reports
 coverage
+selenium
+client
+app
+demo
 
 # Operating systems
 ## Mac OS X
