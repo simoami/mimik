@@ -32,15 +32,15 @@ Mimik is built on top of some of the best open source projects available:
 ## Main Features
 
 - BDD / Cucumber style, Feature based testing
-- supports features written in multiple languages
+- Supports features written in multiple languages
 - Supports both Javascript and Coffeescript source files.
 - Unit and Functional Testing
-- Generate test code automatically
+- Generate test source files "step definitions" automatically
 - Watch for file changes and run specific tests automatically
-- Support multiple parallel testing strategies
-- Supports Cross-browser testing
+- Supports multiple parallel test strategies
+- Supports cross-browser testing
 - Run functional tests on local browsers or cloud-based services
-- Amazing HTML5 reports
+- Rich HTML5 reports
 - Jira and Testrail integration
 - Install and run selenium drivers automatically.
 - More: views, junit output, annotation support, filtering by annotations, 
