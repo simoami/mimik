@@ -1,11 +1,10 @@
 /*jshint node:true*/
 'use strict';
 
-require('colors');
 var Table = require('cli-table'),
     utils = require('../../lib/utils'),
+    tint = require('../../lib/tint'),
     diff = require('diff'),
-    tty = require('tty'),
     tick = '✓ ',
     cross = '✖ ',
     bullet = '◦ ';
@@ -71,8 +70,8 @@ function Reporter(runner, config) {
 Reporter.prototype.displayFeature = function(data) {
     var me = this,
         errorCount = 0,
-        feature = ' Feature: ' + data.feature.title + ('  # ' + data.feature.file).grey;
-    console.log(' ' + getSeparator(feature.length).grey);
+        feature = ' Feature: ' + data.feature.title + tint.gray('  # ' + data.feature.file);
+    console.log(' ' + tint.gray(getSeparator(feature.length)));
     console.log(feature);
     var browserName = data.driver.getBrowserName();
     if(browserName) {
@@ -83,8 +82,8 @@ Reporter.prototype.displayFeature = function(data) {
         scenario.tests.forEach(function(test) {
             var data = [
                 '    ', 
-                (test.state === 'passed' ? tick.green : (test.state === 'failed' ? cross.red : bullet.cyan)) + 
-                test.title.grey
+                (test.state === 'passed' ? tint.green(tick) : (test.state === 'failed' ? tint.red(cross) : tint.cyan(bullet))) + 
+                tint.gray(test.title)
             ];
             // Add duration to the test string if the test passed and is slow.
             if(test.state === 'passed' && test.speed !== 'fast') {
@@ -100,7 +99,7 @@ Reporter.prototype.displayFeature = function(data) {
 };
 Reporter.prototype.displayError = function(error, count) {
         // format
-        var tpl = '\n         %s'.red + '\n%s\n'.grey;
+        var tpl = tint.red('\n         %s') + tint.gray('\n%s\n');
 
         // msg
         var message = error.message || '',
@@ -145,9 +144,9 @@ Reporter.prototype.process = function(stats, target, cb) {
             stats.features, 
             stats.scenarios.total, 
             stats.tests, 
-            stats.passes > 0 ? String(tick + stats.passes).green + (slow > 0 ? String(' ('+slow+' slow)').yellow : ''): 0, 
-            stats.pending > 0 ? String(stats.pending).cyan : 0, 
-            stats.failures > 0 ? String(cross + stats.failures).red : 0
+            stats.passes > 0 ? tint.green(String(tick + stats.passes)) + (slow > 0 ? tint.yellow(String(' ('+slow+' slow)')) : ''): 0, 
+            stats.pending > 0 ? tint.cyan(String(stats.pending)) : 0, 
+            stats.failures > 0 ? tint.red(String(cross + stats.failures)) : 0
             //slow > 0 ? String(slow).yellow : 0, 
         ]
     );

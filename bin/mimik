@@ -13,22 +13,13 @@ var fs = require('fs'),
     pkg = require('../package.json'),
     program = require('commander'),
     utils = require('../lib/utils'),
+    tint = require('../lib/tint'),
     Yadda = require('yadda'),
-    chokidar = require('chokidar'),
-    colors = require('colors');
+    chokidar = require('chokidar');
 
 var stdin = process.stdin,
     stdout = process.stdout,
     prompt = '\u203A';
-
-colors.setTheme({
-    note: 'grey',
-    info: 'white',
-    success: 'green',
-    warn: 'yellow',
-    debug: 'blue',
-    error: 'red'
-});
 
 program
     .version(pkg.version)
@@ -306,11 +297,11 @@ function generateSteps(file) {
                 }, function(answer) {
                     process.stdout.write('\u001B[1A  ' + prompt + ' \u001B[K');
                     if(~['y', 'yes'].indexOf(answer.toLowerCase())) {
-                        console.log('yes'.success + '\n');
+                        console.log(tint.green('yes') + '\n');
                         // user wants to overwrite existing file. Let's proceed
                         return doGenerateSteps(generator, file, data);
                     }
-                    console.log('no'.success + '\n\nok, operation aborted.\n');
+                    console.log(tint.green('no') + '\n\nok, operation aborted.\n');
                     process.exit();
                 });
             });
@@ -324,7 +315,7 @@ function doGenerateSteps(generator, file, data) {
             logger.debug('[command] Could not generate step definitions.', err.message);
             console.error('[command] Could not generate step definitions.', err.message);
         } else if(!data.target) {
-            console.log('Output:\n'.note);
+            console.log(tint.gray('Output:\n'));
             console.log(output);
         }
         process.exit();
@@ -339,7 +330,7 @@ function watchPaths(targets) {
     // Move the cursor to the top
     process.stdout.write('\u001B[f');
     printLogo();
-    console.log('Watching for changes, press', 'Ctrl+C'.note, 'to exit\n');
+    console.log('Watching for changes, press', tint.gray('Ctrl+C'), 'to exit\n');
 
     var fn = function(target) {
         function f(n) {
@@ -348,7 +339,7 @@ function watchPaths(targets) {
         }
         var date = new Date(),
             time = f(date.getHours()) + ":" + f(date.getMinutes()) + ":" + f(date.getSeconds());
-        console.info(('Change detected at ' + time + ' in').note, path.basename(target));
+        console.info(tint.gray('Change detected at ' + time + ' in'), path.basename(target));
         console.log();
         runTests(targets, { watch: true });
     };

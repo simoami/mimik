@@ -1,5 +1,4 @@
 /*jshint node:true*/
-require('colors');
 var utils = require('../../lib/utils');
 
 function buildStep(test) {
