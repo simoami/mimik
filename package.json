@@ -96,7 +96,7 @@
     "request": "^2.34.0",
     "sinon": "^1.9.1",
     "wd": "^0.2.24",
-    "webdriverjs": "^1.7.1",
+    "webdriverio": "^2.1.0",
     "winston": "~0.7.3",
     "yadda": "~0.10.12"
   },

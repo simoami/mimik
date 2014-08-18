@@ -1,6 +1,6 @@
 /*jshint node:true*/
 'use strict';
-var webdriverjs = require('webdriverjs'),
+var webdriverio = require('webdriverio'),
     wd = require('wd'),
     logger = require('winston').loggers.get('mimik'),
     BaseDriver = require('./BaseDriver').proto;
@@ -26,7 +26,7 @@ var Driver = BaseDriver.extend({
             logger.debug('[selenium driver] client event "error"', arguments);
         });
     /*
-        // webdriverjs events
+        // webdriverio events
         this.client.on('end', function() {
             logger.debug('[selenium driver] client event "end"', arguments);
         });
