@@ -1,35 +1,19 @@
 'use strict';
 var expect = require("chai").expect;
 var tint = require('../lib/tint');
-var stubs = { 
-    process: {
-        env: {
-            TERM: 'screen'
-        },
-        stdout: {
-            isTTY: false
-        }
+var proc = {
+    env: {
+        TERM: 'screen'
+    },
+    stdout: {
+        isTTY: true
     }
-};
-var origs = {
-    isTTY: process.stdout.isTTY,
-    platform: process.platform,
-    term: process.env.TERM,
-    colorTerm: 'COLORTERM' in process.env
 };
 
 before(function() {
-    process.stdout.isTTY = true;
-    process.env.TERM = 'screen';
+    tint.setProc(proc);
 });
-after(function() {
-    process.stdout.isTTY = origs.isTTY;
-    process.env.TERM = origs.term;
-    process.platform = origs.platform;
-    if(!origs.colorTerm) {
-        delete process.env.COLORTERM;
-    }
-});
+
 describe('tint', function() {
     it('should style string', function() {
         expect(tint.underline('foo')).to.equal('\x1B[4mfoo\x1B[24m');
@@ -81,14 +65,14 @@ describe('tint.styles', function() {
 describe('tint terminal color support', function() {
     it('should detect terminal support for colors', function() {
         expect(tint.canColor()).to.be.true;
-        process.stdout.isTTY = false;
+        proc.stdout.isTTY = false;
         expect(tint.canColor()).to.be.false;
-        process.stdout.isTTY = true;
-        process.env.TERM = 'fake';
+        proc.stdout.isTTY = true;
+        proc.env.TERM = 'fake';
         expect(tint.canColor()).to.be.false;
-        process.env.COLORTERM = true;
+        proc.env.COLORTERM = true;
         expect(tint.canColor()).to.be.true;
-        process.platform = 'win32';
+        proc.platform = 'win32';
         expect(tint.canColor()).to.be.true;
         
     });
