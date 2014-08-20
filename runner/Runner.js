@@ -42,7 +42,7 @@ Runner.prototype.getConfig = function() {
 Runner.prototype.run = function (cb) {
     var me = this,
         callback = function() {
-            cb.call(me, arguments);
+            cb.apply(me, arguments);
         };
     //me.preProcessDrivers();
     me.preProcessReporters();

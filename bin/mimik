@@ -114,10 +114,11 @@ function filterFiles(files, params) {
     function isRerun(file) {
         return !reruns.length || reruns.indexOf(path.join(process.cwd(), file)) > -1;
     }
-    
+
     // load reruns if any
     if(params.rerun) {
-        var rerunFile = path.join(process.cwd(), params.rerun, 'rerun.dat');
+        var rerunFile = path.join(process.cwd(), 'failed.dat');
+
         if(exists(rerunFile)) {
             reruns = fs.readFileSync(rerunFile).toString().trim();
             reruns = reruns ? reruns.split('\n') : [];
@@ -269,7 +270,7 @@ function mergeConfig(externalConfig) {
     var files = getTestFiles(targets, utils.copyTo({}, program, 'match,matchInvert,tags,excludeTags,rerun'));
     logger.debug('[command] matching files', files);
 
-    utils.apply(utils.copyTo(config, program, 'browsers,timeout,slow,debug,failfast,tunnel,port,testStrategy,reporters,reportPath,rerun,shareSession,match,matchInvert,tags,excludeTags,rerun,watchDelay'), {
+    utils.apply(utils.copyTo(config, program, 'browsers,timeout,slow,debug,failfast,tunnel,port,testStrategy,reporters,reportPath,shareSession,match,matchInvert,tags,excludeTags,rerun,watchDelay'), {
         featureFiles: files.featureFiles,
         stepFiles: files.stepFiles,
         sourceFiles: files.sourceFiles
@@ -290,26 +291,25 @@ function runTests(options) {
     }
 
     function onRunComplete (stats) {
-        /*
-        Exit with the following status codes:
-        0 if testing was completed and all tests passed.
-        1 if testing was completed but some tests failed.
-        */
-        if(program.rerun) {
-            var rerunFile = path.join(process.cwd(), program.rerun, 'rerun.dat'),
-                output = [];
-            if(stats.failures > 0) {
-                utils.each(stats.results, function(result) {
-                    if(result.stats.failures > 0) {
-                        output.push(path.join(process.cwd(), result.feature.file));
-                    }
-                });
-            }
-            fs.writeFileSync(rerunFile, output);
+        // record failed tests for use with the next command if --rerun is enabled
+        var recordFile = path.join(process.cwd(), 'failed.dat'),
+            output = [];
+        if(stats.failures > 0) {
+            utils.each(stats.results, function(result) {
+                if(result.stats.failures > 0) {
+                    output.push(path.join(process.cwd(), result.feature.file));
+                }
+            });
         }
+        fs.writeFileSync(recordFile, output.join('\n'));
         
         // don't exit if we're in watch mode
         if(options && !options.watch) {
+            /*
+                Exit with the following status codes:
+                0 if testing was completed and all tests passed.
+                1 if testing was completed but some tests failed.
+            */
             var exitCode = (stats.failures > 0) ? 1 : 0;
             process.exit(exitCode);
         }
