@@ -269,7 +269,7 @@ function mergeConfig(externalConfig) {
     var files = getTestFiles(targets, utils.copyTo({}, program, 'match,matchInvert,tags,excludeTags,rerun'));
     logger.debug('[command] matching files', files);
 
-    utils.apply(utils.copyTo(config, program, 'browsers,timeout,slow,debug,failfast,tunnel,port,testStrategy,reporters,reportPath,rerun,shareSession,match,matchInvert,tags,excludeTags,rerun'), {
+    utils.apply(utils.copyTo(config, program, 'browsers,timeout,slow,debug,failfast,tunnel,port,testStrategy,reporters,reportPath,rerun,shareSession,match,matchInvert,tags,excludeTags,rerun,watchDelay'), {
         featureFiles: files.featureFiles,
         stepFiles: files.stepFiles,
         sourceFiles: files.sourceFiles
@@ -381,7 +381,7 @@ function doGenerateSteps(generator, file, data) {
 }
 
 
-function watchPaths() {
+function watch() {
 
     // clear the console
     process.stdout.write('\u001B[2J');
@@ -391,12 +391,12 @@ function watchPaths() {
     console.log('Watching for changes, press', tint.gray('Ctrl+C'), 'to exit');
 
     var fn = function(target) {
-        function f(n) {
+        function fmt(n) {
             // Format integers to have a leading zero.
             return n < 10 ? '0' + n : n;
         }
         var date = new Date(),
-            time = f(date.getHours()) + ":" + f(date.getMinutes()) + ":" + f(date.getSeconds());
+            time = fmt(date.getHours()) + ":" + fmt(date.getMinutes()) + ":" + fmt(date.getSeconds());
         console.info(tint.gray('\nChange detected at ' + time + ' in'), path.basename(target));
         console.log();
         
@@ -415,6 +415,10 @@ function watchPaths() {
 
     };
 
+    // add buffer delay to reduce massive triggering of test runs on file changes
+    var cmd = program.args.slice(-1)[0];
+    fn = buffer(fn, cmd.watchDelay);
+
     var targets = program.args.slice(0, -1);
     targets = targets.length > 0 ? targets : ['.'];
 
@@ -429,6 +433,19 @@ function watchPaths() {
     });
 
 }
+
+function buffer(fn, ms, scope) {
+    var id;
+    return function() {
+           clearTimeout(id);
+           var args = arguments;
+           id = setTimeout(function() {
+               fn.apply(scope||this, args);
+               id = null;
+             }, ms);
+    };
+}
+
 function processCommand(cmd) {
 
     if(cmd.action === 'run') {
@@ -452,7 +469,7 @@ function processCommand(cmd) {
     } else if(cmd.action === 'watch') {
         logger.info('[command] execute "watch" mode');
 
-        watchPaths();
+        watch();
 
     } else if(cmd.action === 'web') {
 
