@@ -1,6 +1,6 @@
 /*jshint node:true*/
 
-
+'use strict';
 /**
  * Module dependencies.
  */
@@ -38,7 +38,7 @@ Runner.prototype.setConfig = function(config) {
 };
 Runner.prototype.getConfig = function() {
     return this.config;
-}
+};
 Runner.prototype.run = function (cb) {
     var me = this,
         callback = function() {
