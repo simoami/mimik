@@ -49,11 +49,10 @@ function Reporter(runner, config) {
     if (!runner) {
         return;
     }
-    me.runner = runner;
-    me.options = runner.options;
+    me.config = runner.config;
 
     runner.on('start', function() {
-        var total = me.options.featureFiles.length;
+        var total = me.config.featureFiles.length;
         if(total > 0) {
             console.log(' Found %d %s', total, pluralize('feature', 'features', total));
         } else {

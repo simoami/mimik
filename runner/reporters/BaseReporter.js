@@ -63,9 +63,6 @@ function Reporter(runner) {
     if (!runner) {
         return;
     }
-    me.runner = runner;
-    me.options = runner.options;
-
     runner.stats = stats;
 
     runner.on('start', function() {

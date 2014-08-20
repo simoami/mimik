@@ -15,11 +15,13 @@ var fs = require('fs'),
     utils = require('../lib/utils'),
     tint = require('../lib/tint'),
     Yadda = require('yadda'),
-    chokidar = require('chokidar');
+    chokidar = require('chokidar'),
+    Runner = require('../runner/Runner');
 
 var stdin = process.stdin,
     stdout = process.stdout,
-    prompt = '\u203A';
+    prompt = '\u203A',
+    runner;
 
 program
     .version(pkg.version)
@@ -53,17 +55,19 @@ function scanFiles(target) {
  * filter through a list of files using optional match patterns
  */
 function filterFiles(files, params) {
+
     var re = new RegExp(params.match || '');
     var inv = !!params.matchInvert,
         featureFiles = [],
         stepFiles = [],
         sourceFiles = [],
-        ignore = ['node_modules', 'bower_components', '.svn', '.git'];
+        ignore = ['reports', 'coverage', 'node_modules', 'bower_components', '.svn', '.git'];
 
     var English = Yadda.localisation.English,
         parser = new Yadda.parsers.FeatureFileParser(English);
 
-    function ignored(path) {
+    // exclude dynamically temporary folders that mimik is known to generate
+    function isIgnored(path) {
         var ignored = false;
         for(var i = 0, len = ignore.length; i < len; i++) {
             if(~path.indexOf(ignore[i])) {
@@ -123,7 +127,7 @@ function filterFiles(files, params) {
     }
     
     files.forEach(function(file) {
-        if(!ignored(file)) {
+        if(!isIgnored(file)) {
             // filter by match pattern, tag annotations and reruns
             if(isFeature(file) && filterByPattern(file, re, inv) && filterByTags(file, params) && isRerun(file)) {
                 featureFiles.push(file);
@@ -140,12 +144,14 @@ function filterFiles(files, params) {
         stepFiles: stepFiles,
         sourceFiles: sourceFiles
     };
+
 }
 
 /*
  * scan and filter through passed file paths to retrieve tests.
  */
 function getTestFiles(args, options) {
+
     // default files to ./**/*.{feature,js,coffee}
     var files = [];
     args = args.length > 0 ? args : ['.'];
@@ -154,8 +160,8 @@ function getTestFiles(args, options) {
     });
     // process exclusions and filtering
     return filterFiles(files, options);
-}
 
+}
 
 function getLogger(config) {
     var isatty = require('tty').isatty(process.stdout.fd),
@@ -203,26 +209,63 @@ function getLogger(config) {
     return logger;
 }
 
-function runTests(targets, options) {
-    // Process configuration
-    var config = {};
+/**
+ * Load an external configuration file. Supported formats are:
+ * - JSON configuration file can be overwritten by command line options). Example: config.json, setup.conf
+ * - JS configuration file enables more capabilities such as hooking up to the mimik's execution lifecycle and enabling plugin extendability. Example: config.js
+ * - COFFEE configuration file is a coffeescript variation of the js config file. Example config.coffee
+ *
+ *  @param config
+ */
+function loadConfig(file, runner, cb) {
+
+    if(!file) {
+        // no external config
+        return cb(null, null);
+    }
     
-    if(runner && runner.state === 'started') {
-        runner.abort(function() {
-            runTests(targets, options);
+    file = path.join(process.cwd(), file);
+    if(path.basename(file).match(/.(js|coffee)$/)) {
+        // JS or coffeescript input file
+        // invalidate cached version of the config file if it's already cached
+        delete require.cache[file];
+        var config = require(file);
+        config(runner);
+        return cb(null);
+    }
+
+    if(path.basename(file).match(/.(json|conf)$/)) {
+        // json config file
+        fs.readFile(file, function(err, config) {
+            try {
+                config = JSON.parse(config);
+                runner.setConfig(config);
+                return cb(null);
+            } catch(e) {
+                console.error('Error parsing config file:', file);
+                console.error(e.message);
+                // return cb(e);
+                process.exit(1);
+            }
         });
         return;
     }
-    if(program.config) {
-        try {
-            config = JSON.parse(fs.readFileSync(program.config));
-        } catch(e) {
-            console.error('Error parsing config file:', program.config);
-            console.error(e.message);
-            process.exit(1);
-        }
-    }
+    
+    console.error('Unsupported config file:', file);
+    // return cb(new Error('Unsupported config file:' + file));
+    process.exit(1);
+
+}
+/**
+ * merge external config file with inline config. Inline config overrides external config
+ */
+function mergeConfig(externalConfig) {
+
+    var config = externalConfig || {};
     // Fetch test files and apply file pattern filtering
+    var targets = program.args.slice(0, -1);
+    targets = targets.length > 0 ? targets : ['.'];
+
     var files = getTestFiles(targets, utils.copyTo({}, program, 'match,matchInvert,tags,excludeTags,rerun'));
     logger.debug('[command] matching files', files);
 
@@ -232,7 +275,19 @@ function runTests(targets, options) {
         sourceFiles: files.sourceFiles
     });
     logger.debug('[command] configuration', config);
+    return config;
 
+}
+
+function runTests(options) {
+
+    // If runTests() is invoked over an already active session, then abort current execution first then start a new one.
+    if(runner && runner.state === 'started') {
+        runner.abort(function() {
+            runTests(options);
+        });
+        return;
+    }
 
     function onRunComplete (stats) {
         /*
@@ -252,20 +307,20 @@ function runTests(targets, options) {
             }
             fs.writeFileSync(rerunFile, output);
         }
-
-        runner = null;
+        
         // don't exit if we're in watch mode
         if(options && !options.watch) {
             var exitCode = (stats.failures > 0) ? 1 : 0;
             process.exit(exitCode);
         }
     }
-
-    var Runner = require('../runner/Runner');
-    runner = new Runner(config);
+    // Execute the runner
     runner.run(onRunComplete);
+
 }
+
 function generateSteps(file) {
+
     var StepDefinitionGenerator = require('../lib/StepDefinitionGenerator'),
         generator = new StepDefinitionGenerator();
     // clear the console
@@ -307,9 +362,11 @@ function generateSteps(file) {
             });
         });
     });
+
 }
 
 function doGenerateSteps(generator, file, data) {
+
     generator.generateFromFile(file, data.language, data.type, data.target, function(err, output) {
         if(err) {
             logger.debug('[command] Could not generate step definitions.', err.message);
@@ -320,17 +377,18 @@ function doGenerateSteps(generator, file, data) {
         }
         process.exit();
     });
+
 }
 
 
-function watchPaths(targets) {
+function watchPaths() {
 
     // clear the console
     process.stdout.write('\u001B[2J');
     // Move the cursor to the top
     process.stdout.write('\u001B[f');
     printLogo();
-    console.log('Watching for changes, press', tint.gray('Ctrl+C'), 'to exit\n');
+    console.log('Watching for changes, press', tint.gray('Ctrl+C'), 'to exit');
 
     var fn = function(target) {
         function f(n) {
@@ -339,12 +397,27 @@ function watchPaths(targets) {
         }
         var date = new Date(),
             time = f(date.getHours()) + ":" + f(date.getMinutes()) + ":" + f(date.getSeconds());
-        console.info(tint.gray('Change detected at ' + time + ' in'), path.basename(target));
+        console.info(tint.gray('\nChange detected at ' + time + ' in'), path.basename(target));
         console.log();
-        runTests(targets, { watch: true });
+        
+        // instantiate a new runner instance
+        runner = new Runner();
+
+        // Process configuration    
+        loadConfig(program.config, runner, function(err) {
+            if(err) {
+                return;
+            }
+            var config = mergeConfig(runner.getConfig());
+            runner.setConfig(config);
+            runTests({ watch: true });
+        });
+
     };
 
+    var targets = program.args.slice(0, -1);
     targets = targets.length > 0 ? targets : ['.'];
+
     var watcher = chokidar.watch(targets, { 
         ignored: /[\/\\]\./, 
         persistent: true,
@@ -357,18 +430,39 @@ function watchPaths(targets) {
 
 }
 function processCommand(cmd) {
+
     if(cmd.action === 'run') {
+
         logger.info('[command] execute "run" mode');
         printLogo();
-        runTests(cmd.args);
+
+        // instantiate a new runner instance
+        runner = new Runner();
+
+        // Process configuration    
+        loadConfig(program.config, runner, function(err) {
+            if(err) {
+                return;
+            }
+            var config = mergeConfig(runner.getConfig());
+            runner.setConfig(config);
+            runTests();
+        });
+
     } else if(cmd.action === 'watch') {
         logger.info('[command] execute "watch" mode');
-        watchPaths(cmd.args);
+
+        watchPaths();
+
     } else if(cmd.action === 'web') {
+
         logger.info('[command] execute "web" mode');
         printLogo();
+
     } else if(cmd.action === 'generate') {
+
         logger.info('[command] execute "generate" mode');
+
         if(!cmd.file) {
             printLogo();
             console.error('  The "generate" command requires a file <path>.');
@@ -377,11 +471,14 @@ function processCommand(cmd) {
             return;
         }
         generateSteps(cmd.file);
+
     } else {
+
         printLogo();
         console.error('  No command specified.');
         console.error('  ---------------------');
         program.help();
+
     }
 }
 function printLogo() {

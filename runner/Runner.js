@@ -15,20 +15,30 @@ var async = require('async'),
 // Expose the View class globally so that loaded test files have access to it
 global.View = require('../lib/View');
 
-function Runner(options) {
+function Runner(config) {
     var me = this;
     me.state = 'stopped';
-    options = options || {};
-    me.options = options;
     me.reporters = {};
     me.sessions = {};
-    // process browser profiles
-    me.processBrowserProfiles(me.options.browsers);
-    EventEmitter.call(me, options);
+    EventEmitter.call(me, config);
+    me.setConfig(config);
 }
 // Make Runner an Observable
 utils.extend(Runner, EventEmitter);
 
+/**
+ * setConfig set runner configuration
+ *
+ * @param config The configuration object
+ */
+Runner.prototype.setConfig = function(config) {
+    this.config = config || {};
+    // process browser profiles
+    this.processBrowserProfiles(this.config.browsers);
+};
+Runner.prototype.getConfig = function() {
+    return this.config;
+}
 Runner.prototype.run = function (cb) {
     var me = this,
         callback = function() {
@@ -40,7 +50,7 @@ Runner.prototype.run = function (cb) {
     me.state = 'started';
     me.emit('start');
     
-    if(me.options.testStrategy === 'browser') {
+    if(me.config.testStrategy === 'browser') {
         me.runBrowserStrategy(callback);
     } else {
         // default mode
@@ -55,7 +65,7 @@ Runner.prototype.runBrowserStrategy = function(cb) {
         tasks.push(function(callback) {
             // run features under current profile
             async.eachSeries(
-                me.options.featureFiles, 
+                me.config.featureFiles, 
                 function(featureFile, callback) {
                     //console.log('running', featureFile, 'in', profile.desiredCapabilities.browserName);
                     me.runFeatureFile(featureFile, profile, callback);
@@ -84,14 +94,14 @@ Runner.prototype.runTestStrategy = function(cb) {
     q.drain = function() {
         me.postRun(cb);
     };
-    q.push(me.options.featureFiles);
+    q.push(me.config.featureFiles);
 };
 Runner.prototype.runFeatureFile = function (featureFile, profile, callback) {
     var me = this;
     var session = new Session({
         featureFile: featureFile,
         profile: profile,
-        options: me.options
+        options: me.config // TODO change Session property to config
     });
     me.sessions[session.getId()] = session;
     me.setupListeners(session);
@@ -126,7 +136,7 @@ Runner.prototype.preProcessReporters = function() {
     var me = this,
         reps = [{ name: 'base'}];
     me.emit('reporter-pre-process', me);
-    utils.each(me.options.reporters||['console'], function(reporter) {
+    utils.each(me.config.reporters||['console'], function(reporter) {
         reporter = utils.isObject(reporter) ? reporter : { name: reporter };
         if(reporter.name !== 'base') {
             reps.push(reporter);
@@ -150,7 +160,7 @@ Runner.prototype.postProcessReporters = function(callback) {
     utils.each(me.reporters, function(reporter, key) {
         if(reporter.process && key !== 'base') {
             series.push(function(cb) {
-                reporter.process(me.stats, me.options.reportPath, cb);
+                reporter.process(me.stats, me.config.reportPath, cb);
             });
         }
     });
@@ -206,6 +216,20 @@ Runner.prototype.setupListeners = function(source) {
     });
 };
 
+/**
+ * Process an array of browser profiles and convert string elements to valid browser profile objects. 
+ * Note that string elements automatically use the local browser and webdriver as the selected driver.
+ *
+ * @param profiles An mixed array of browser profiles. Strings and object elements are supported. 
+ * Example: 
+ *      'chrome' or 
+ *      { 
+ *          desiredCapabilities: {
+ *              browserName: 'chrome'
+ *          },
+ *          driver: 'webdriver'
+ *      }
+ */
 Runner.prototype.processBrowserProfiles = function (profiles) {
     var me = this;
     me.browserProfiles = [];

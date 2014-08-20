@@ -32,8 +32,6 @@ function Reporter(runner, config) {
     if (!runner) {
         return;
     }
-    me.runner = runner;
-    me.options = runner.options;
     me.config = config;
     me.validateConfig(config);
 }

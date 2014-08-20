@@ -14,7 +14,7 @@ function Reporter(runner) {
         return;
     }
     me.runner = runner;
-    me.options = runner.options;
+    me.config = runner.config;
     me.screenshots = [];
     runner.on('fail', function(test) {
         me.getScreenshot(test);
@@ -170,14 +170,14 @@ Reporter.prototype.createParamsPage = function(dir, cb) {
     var tpl = dot.template(baseTpl, null, {
         body: parametersTpl
     });
-    var options = me.runner.options;    
+    var config = me.runner.config;    
     var output = tpl({
         title: 'Test Parameters',
-        options: me.getOptions(options),
-        profiles: me.getProfiles(options),
-        featureFiles: options.featureFiles,
-        stepFiles: options.stepFiles,
-        sourceFiles: options.sourceFiles,
+        options: me.getOptions(config),
+        profiles: me.getProfiles(config),
+        featureFiles: config.featureFiles,
+        stepFiles: config.stepFiles,
+        sourceFiles: config.sourceFiles,
         fn: {
             utils: utils,
             fileType: me.getFileType,
