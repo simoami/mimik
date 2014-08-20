@@ -221,22 +221,36 @@ You can access the full documentation [here]().
 
     -h, --help                  output usage information
     -V, --version               output the version number
-    -c, --config <path>         specify an alternative config file
+    -c, --config <path>         specify an external config file
     -b, --browsers <names>      comma-delimited <names> of local browsers to use (chrome|firefox|ie|safari|phantomjs)
     -m, --match <pattern>       only run features matching <pattern>
     --match-invert              inverts --match results
     -T, --tags <names>          only run feature tests annotated with one of the comma-delimited tag <names>
-    -E, --exclude-tags <names>  exclude feature tests  annotated with one of the comma-delimited tag <names>
+    -E, --exclude-tags <names>  exclude feature tests annotated with one of the comma-delimited tag <names>
     -t, --timeout <ms>          set per-test timeout in milliseconds [10000]
     -s, --slow <ms>             "slow" test threshold in milliseconds [5000]
     -f, --failfast              stop running tests on the first encoutered failure or timeout
-    --test-strategy <name>      "test" runs different tests in parallel. "browser" runs the same test in mutiple browsers [test]
+    --test-strategy <name>      "test" runs various tests in parallel. "browser" runs each test against mutiple browsers [test]
     --reporters <names>         comma-delimited report <names> to enable. available options: junit,html
     --report-path <path>        path for the generated reports
-    --rerun <path>              path to generate a list of failed features or rerun features from an previously generated file
+    --rerun <path>              path to generate list of failed tests. if file exists run previously failed tests
     --debug                     enable debug logging
     --log <path>                path including file name to create a file log
+
+  Run mimik [command] --help to see description and available options for a particular command
+
 ```
+
+#### Options for the watch command
+```
+  Usage: watch [options] [path ...]
+
+  Options:
+
+    -h, --help              output usage information
+    -d, --watch-delay <ms>  Buffers multiple changes into a single run using a delay in milliseconds [500]
+```
+
 
 ### The Selenium Launcher command
 ```
