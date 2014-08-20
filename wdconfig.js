@@ -10,7 +10,7 @@ var DriverConfig = {
         name: 'Selenium Standalone',
         bin: null,
         url: getSeleniumStandaloneUrl,
-        version: '2.42.0',
+        version: '2.42.2',
         filePattern: 'selenium-server-standalone-.*[.]jar',
         install: true,
         applicable: function() { return true; },
