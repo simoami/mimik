@@ -230,12 +230,12 @@ You can access the full documentation [here]().
     -t, --timeout <ms>          set per-test timeout in milliseconds [10000]
     -s, --slow <ms>             "slow" test threshold in milliseconds [5000]
     -f, --failfast              stop running tests on the first encoutered failure or timeout
-    --test-strategy <name>      "test" runs various tests in parallel. "browser" runs each test against mutiple browsers [test]
+    --test-strategy <name>      `test` runs various tests in parallel. `browser` runs each test against mutiple browsers [test]
     --reporters <names>         comma-delimited report <names> to enable. available options: junit,html
     --report-path <path>        path for the generated reports
-    --rerun <path>              path to generate list of failed tests. if file exists run previously failed tests
+    --rerun <path>              rerun failed tests recorded in `failed.dat` from the last test run
     --debug                     enable debug logging
-    --log <path>                path including file name to create a file log
+    --log <path>                output a log file to filename
 
   Run mimik [command] --help to see description and available options for a particular command
 
