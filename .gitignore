@@ -32,3 +32,4 @@ bower_components
 .*.swp
 ## Sublime
 sublime-*
+.idea
