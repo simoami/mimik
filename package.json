@@ -100,12 +100,12 @@
   },
   "devDependencies": {
     "coveralls": "^2.11.4",
-    "express": "^4.1.2",
+    "express": "^4.13.3",
     "istanbul": "^0.3.19",
     "jshint": "^2.8.0",
     "mock-utf8-stream": "~0.1.1",
-    "proxyquire": "^1.0.1",
-    "sinon": "^1.10.3"
+    "proxyquire": "^1.7.1",
+    "sinon": "^1.16.1"
   },
   "testConfig": {
     "port": 3000
